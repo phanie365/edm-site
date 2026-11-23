@@ -143,6 +143,14 @@ alter table public.resource_files enable row level security;
 alter table public.site_settings  enable row level security;
 alter table public.site_pages     enable row level security;
 
+-- Droits d'accès explicites (les projets Supabase récents n'en donnent plus par défaut).
+-- Les règles RLS ci-dessous restreignent ensuite ce que chacun voit et modifie.
+grant usage on schema public to anon, authenticated;
+grant select on public.site_settings, public.site_pages, public.resources, public.resource_files to anon, authenticated;
+grant select on public.admins to authenticated;
+grant insert, update, delete on public.resources, public.resource_files to authenticated;
+grant update on public.site_settings, public.site_pages to authenticated;
+
 -- Les visiteurs n'ont aucun droit d'écriture, même en cas d'erreur de règle.
 revoke insert, update, delete, truncate on all tables in schema public from anon;
 revoke truncate on all tables in schema public from authenticated;
