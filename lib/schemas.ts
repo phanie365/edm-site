@@ -55,7 +55,14 @@ export const schemaReglages = z.object({
   contact_email: facultatif(120).refine((v) => v === null || z.string().email().safeParse(v).success, {
     message: 'Adresse email invalide.',
   }),
-  phone: facultatif(30).refine((v) => v === null || /^[\d\s+().-]{6,30}$/.test(v), { message: 'Numéro invalide.' }),
+  contacts: z
+    .array(
+      z.object({
+        nom: z.string().trim().min(1, 'Indiquez le prénom de chaque contact.').max(40),
+        telephone: z.string().trim().regex(/^[\d\s+().-]{6,30}$/, 'Numéro de téléphone invalide.'),
+      }),
+    )
+    .max(4, '4 contacts maximum.'),
   whatsapp_url: facultatif(200).refine(
     (v) => v === null || /^https:\/\/(wa\.me|chat\.whatsapp\.com|api\.whatsapp\.com)\//i.test(v),
     { message: 'Le lien doit commencer par https://wa.me/ ou https://chat.whatsapp.com/' },

@@ -362,7 +362,9 @@ export async function enregistrerReglages(_avant: Resultat | null, formData: For
     address: formData.get('address') ?? '',
     address_details: formData.get('address_details') ?? '',
     contact_email: formData.get('contact_email') ?? '',
-    phone: formData.get('phone') ?? '',
+    contacts: [0, 1, 2, 3]
+      .map((i) => ({ nom: String(formData.get(`contact_nom_${i}`) ?? ''), telephone: String(formData.get(`contact_tel_${i}`) ?? '') }))
+      .filter((c) => c.nom.trim() || c.telephone.trim()),
     whatsapp_url: formData.get('whatsapp_url') ?? '',
   });
   if (!verif.success) return KO('Merci de corriger les champs indiqués.', erreursParChamp(verif.error));

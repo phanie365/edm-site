@@ -122,7 +122,7 @@ Un projet Supabase gratuit est **mis en pause après 7 jours sans activité**. P
 
 ## 6. Le formulaire de contact (facultatif)
 
-La section **« Nous contacter »** se trouve sur la page **Nous rejoindre** (l'ancienne adresse `/contact` y mène aussi). Sans configuration, elle affiche l'email, le téléphone et le lien WhatsApp renseignés dans l'admin. Pour ajouter un **formulaire** :
+La section **« Nous contacter »** se trouve sur la page **Nous rejoindre** (l'ancienne adresse `/contact` y mène aussi). Sans configuration, elle affiche les personnes à contacter (prénom + téléphone), l'email et le lien WhatsApp renseignés dans l'admin. Pour ajouter un **formulaire** :
 
 1. Créez un compte gratuit sur <https://resend.com> et une **API Key**.
 2. Pour envoyer depuis votre propre adresse, ajoutez votre nom de domaine dans Resend (rubrique *Domains*).
@@ -179,7 +179,7 @@ Cette page regroupe :
 - le nom de l'église et le message d'accueil ;
 - les **4 points forts** de l'accueil ;
 - la rencontre : jour, heure, adresse et précision (le bouton « Itinéraire » ouvre l'application de cartes du téléphone) ;
-- l'email, le téléphone et le lien WhatsApp (`https://wa.me/33…`) ;
+- les **personnes à contacter** (jusqu'à 4, prénom + numéro : Clotilde et Ephrem au départ), l'email et le lien WhatsApp (`https://wa.me/33…`) ;
 - les **photos du site** : l'accueil (une photo est fournie par défaut), le haut de la fenêtre « En savoir plus » et la page Nous rejoindre. Préférez des photos en format paysage, d'au moins 1600 px de large, pour qu'elles restent nettes.
 
 > En cas d'erreur dans un formulaire, ce que vous avez tapé est conservé : corrigez le champ signalé en rouge et enregistrez à nouveau.

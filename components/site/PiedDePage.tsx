@@ -39,13 +39,13 @@ export function PiedDePage({ reglages }: { reglages: Reglages }) {
                 </a>
               </li>
             )}
-            {reglages.phone && (
-              <li>
-                <a href={lienTelephone(reglages.phone)} className="inline-flex min-h-10 items-center gap-2 hover:underline">
-                  <Phone aria-hidden size={17} /> {reglages.phone}
+            {reglages.contacts.map((c) => (
+              <li key={`${c.nom}-${c.telephone}`}>
+                <a href={lienTelephone(c.telephone)} className="inline-flex min-h-10 items-center gap-2 hover:underline">
+                  <Phone aria-hidden size={17} /> {c.nom} · {c.telephone}
                 </a>
               </li>
-            )}
+            ))}
             {reglages.whatsapp_url && (
               <li>
                 <a href={reglages.whatsapp_url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center gap-2 hover:underline">

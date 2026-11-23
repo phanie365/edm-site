@@ -65,7 +65,7 @@ describe('schemaReglages', () => {
     address: 'République, Villeurbanne',
     address_details: '',
     contact_email: '',
-    phone: '',
+    contacts: [],
     whatsapp_url: '',
   };
   it('accepte des coordonnées vides', () => expect(schemaReglages.safeParse(base).success).toBe(true));
@@ -73,6 +73,13 @@ describe('schemaReglages', () => {
     expect(schemaReglages.safeParse({ ...base, contact_email: 'pas-un-email' }).success).toBe(false);
     expect(schemaReglages.safeParse({ ...base, whatsapp_url: 'https://exemple.fr' }).success).toBe(false);
     expect(schemaReglages.safeParse({ ...base, whatsapp_url: 'https://wa.me/33600000000' }).success).toBe(true);
+  });
+  it('valide les contacts (prénom + numéro), 4 maximum', () => {
+    const c = { nom: 'Clotilde', telephone: '06 51 99 94 22' };
+    expect(schemaReglages.safeParse({ ...base, contacts: [c, { nom: 'Ephrem', telephone: '07 87 07 20 22' }] }).success).toBe(true);
+    expect(schemaReglages.safeParse({ ...base, contacts: [{ nom: '', telephone: '0651999422' }] }).success).toBe(false);
+    expect(schemaReglages.safeParse({ ...base, contacts: [{ nom: 'X', telephone: 'abc' }] }).success).toBe(false);
+    expect(schemaReglages.safeParse({ ...base, contacts: [c, c, c, c, c] }).success).toBe(false);
   });
   it('limite à 4 points forts', () => {
     const p = { titre: 'a', texte: 'b' };

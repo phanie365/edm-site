@@ -88,9 +88,17 @@ create table public.site_settings (
   address          text not null default '61 rue Anatole France, 69100 Villeurbanne',
   address_details  text,
   contact_email    text check (contact_email is null or contact_email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'),
-  phone            text check (phone is null or length(phone) <= 30),
+  -- Personnes à contacter : [{ "nom": "Clotilde", "telephone": "06 51 99 94 22" }] (4 maximum)
+  contacts         jsonb not null default '[
+    {"nom": "Clotilde", "telephone": "06 51 99 94 22"},
+    {"nom": "Ephrem",   "telephone": "07 87 07 20 22"}
+  ]'::jsonb,
   whatsapp_url     text check (whatsapp_url is null or whatsapp_url ~* '^https://(wa\.me|chat\.whatsapp\.com|api\.whatsapp\.com)/'),
   updated_at       timestamptz not null default now(),
+  constraint contacts_valides check (
+    jsonb_typeof(contacts) = 'array'
+    and jsonb_array_length(contacts) <= 4
+    and not jsonb_path_exists(contacts, '$[*] ? (@.type() != "object" || !exists(@.nom) || !exists(@.telephone))')),
   constraint highlights_valides check (
     jsonb_typeof(highlights) = 'array'
     and jsonb_array_length(highlights) <= 4

@@ -157,7 +157,7 @@ export default async function Accueil() {
               <div className="space-y-3">
                 <Mail aria-hidden size={30} strokeWidth={1.4} />
                 <h2 className="text-3xl font-bold">Une question ?</h2>
-                <p className="text-[17px] text-encre-3">N’hésitez pas à nous écrire, nous serons heureux de vous répondre.</p>
+                <p className="text-[17px] text-encre-3">N’hésitez pas à nous contacter, nous serons heureux de vous répondre.</p>
               </div>
               <Link href="/nous-rejoindre#contact" className="bouton bouton-plein">
                 Nous contacter <ArrowRight aria-hidden size={18} />

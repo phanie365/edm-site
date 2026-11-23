@@ -103,7 +103,19 @@ export function FormulaireReglages({ reglages: r }: { reglages: Reglages }) {
         <p className="-mt-2 text-sm text-encre-2">Toutes facultatives : seules celles renseignées s’affichent.</p>
         <div className="grid gap-5 sm:grid-cols-2">
           <Champ nom="contact_email" libelle="Email" type="email" inputMode="email" valeur={r.contact_email} erreur={e.contact_email} max={120} autoComplete="off" />
-          <Champ nom="phone" libelle="Téléphone" type="tel" inputMode="tel" valeur={r.phone} erreur={e.phone} max={30} autoComplete="off" />
+        </div>
+        <div>
+          <p className="font-semibold">Personnes à contacter</p>
+          <p className="mb-3 text-sm text-encre-2">Jusqu’à 4. Prénom et numéro ; laissez vide pour en afficher moins.</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="grid grid-cols-[1fr_1.3fr] gap-3 rounded-2xl bg-papier p-4">
+                <Champ nom={`contact_nom_${i}`} libelle="Prénom" valeur={r.contacts[i]?.nom} max={40} autoComplete="off" />
+                <Champ nom={`contact_tel_${i}`} libelle="Téléphone" type="tel" inputMode="tel" valeur={r.contacts[i]?.telephone} max={30} autoComplete="off" />
+              </div>
+            ))}
+          </div>
+          <ErreurChamp id="contacts-erreur" message={Object.entries(e).find(([k]) => k.startsWith('contacts'))?.[1]} />
         </div>
         <Champ
           nom="whatsapp_url"

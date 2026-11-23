@@ -29,7 +29,7 @@ export default async function NousRejoindre() {
   const formulaire = contactConfigure();
   const coordonnees = [
     r.contact_email && { href: `mailto:${r.contact_email}`, icone: Mail, libelle: r.contact_email, externe: false },
-    r.phone && { href: lienTelephone(r.phone), icone: Phone, libelle: r.phone, externe: false },
+    ...r.contacts.map((c) => ({ href: lienTelephone(c.telephone), icone: Phone, libelle: `${c.nom} · ${c.telephone}`, externe: false })),
     r.whatsapp_url && { href: r.whatsapp_url, icone: MessageCircle, libelle: 'Nous écrire sur WhatsApp', externe: true },
   ].filter(Boolean) as { href: string; icone: typeof Mail; libelle: string; externe: boolean }[];
 
@@ -89,7 +89,7 @@ export default async function NousRejoindre() {
             <h2 id="titre-contact" className="text-3xl font-bold">
               Nous contacter
             </h2>
-            <p className="mt-2 text-lg text-encre-3">Une question, ou envie de venir une première fois ? Écrivez-nous.</p>
+            <p className="mt-2 text-lg text-encre-3">Une question, ou envie de venir une première fois ? Contactez-nous.</p>
           </div>
 
           {formulaire && <FormulaireContact />}

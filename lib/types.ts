@@ -56,6 +56,11 @@ export interface PointFort {
   texte: string;
 }
 
+export interface ContactPersonne {
+  nom: string;
+  telephone: string;
+}
+
 export interface Reglages {
   church_name: string;
   hero_kicker: string;
@@ -71,7 +76,7 @@ export interface Reglages {
   address: string;
   address_details: string | null;
   contact_email: string | null;
-  phone: string | null;
+  contacts: ContactPersonne[];
   whatsapp_url: string | null;
   updated_at?: string;
 }
