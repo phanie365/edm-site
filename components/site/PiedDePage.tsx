@@ -55,7 +55,7 @@ export function PiedDePage({ reglages }: { reglages: Reglages }) {
             )}
             <li>
               <Link href="/nous-rejoindre#contact" className="inline-flex min-h-10 items-center hover:underline">
-                Formulaire de contact
+                Nous contacter
               </Link>
             </li>
           </ul>

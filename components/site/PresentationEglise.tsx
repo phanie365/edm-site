@@ -43,40 +43,60 @@ export function PresentationEglise({ sections, image }: { sections: SectionEglis
     };
   }, [ouverte]);
 
+  const presentationRemplie = Boolean(presentation?.content.trim());
+  const visionRemplie = Boolean(vision?.content.trim());
+  // « En savoir plus » seulement s'il y a davantage à lire que les résumés affichés
+  const autres = aAfficher.filter((x) => x.slug !== 'presentation' && x.slug !== 'vision');
+  const tronque = (texte?: string) => Boolean(texte && extrait(texte, 320) !== texte.replace(/\s+/g, ' ').trim());
+  const aDeLaSuite = autres.length > 0 || tronque(presentation?.content) || tronque(vision?.content) || Boolean(image && aAfficher.length);
+
+  const boutonSuite = (ancre: string | undefined, clair: boolean, libelle: string) =>
+    aDeLaSuite ? (
+      <button
+        type="button"
+        onClick={() => ouvrir(ancre)}
+        aria-haspopup="dialog"
+        className={`mt-auto inline-flex min-h-11 cursor-pointer items-center gap-1.5 self-start font-semibold underline underline-offset-4 ${clair ? '' : 'text-vert'}`}
+      >
+        {libelle} <ArrowRight aria-hidden size={17} />
+      </button>
+    ) : null;
+
+  if (!presentationRemplie && !visionRemplie) return null;
+
   return (
     <>
-      <div className="grid gap-6 lg:grid-cols-2">
-        <article className="carte flex flex-col gap-4 p-7 sm:p-10">
-          <p className="surtitre">Qui sommes-nous</p>
-          <h2 id="titre-presentation" className="text-3xl font-bold">
-            {presentation?.title ?? 'Notre église de maison'}
+      {/* Vision seule : un bandeau vert, pleine largeur */}
+      {visionRemplie && !presentationRemplie ? (
+        <article className="flex flex-col gap-5 rounded-carte bg-vert px-7 py-10 text-clair sm:px-12 sm:py-14 lg:px-16">
+          <h2 id="titre-presentation" className="text-xs font-semibold tracking-[.12em] text-clair-2 uppercase">
+            {vision!.title}
           </h2>
-          <p className="text-[17px] leading-relaxed text-encre-3">{extrait(presentation?.content, 320)}</p>
-          <button
-            type="button"
-            onClick={() => ouvrir()}
-            aria-haspopup="dialog"
-            className="lien-souligne mt-auto inline-flex min-h-11 cursor-pointer items-center gap-1.5 self-start font-semibold text-vert"
-          >
-            En savoir plus <ArrowRight aria-hidden size={17} />
-          </button>
+          <Contenu texte={extrait(vision!.content, 320)} className="!text-2xl !leading-snug font-medium !text-clair sm:!text-3xl lg:!text-4xl" />
+          {boutonSuite('vision', true, 'En savoir plus')}
         </article>
-        {vision?.content.trim() && (
-          <article className="flex flex-col gap-4 rounded-carte bg-vert p-7 text-clair sm:p-10">
-            <p className="text-xs font-semibold tracking-[.12em] text-clair-2 uppercase">Notre vision</p>
-            <h2 className="text-3xl font-bold">{vision.title}</h2>
-            <Contenu texte={extrait(vision.content, 320)} className="!text-clair-2" />
-            <button
-              type="button"
-              onClick={() => ouvrir('vision')}
-              aria-haspopup="dialog"
-              className="mt-auto inline-flex min-h-11 cursor-pointer items-center gap-1.5 self-start font-semibold underline underline-offset-4"
-            >
-              Lire notre vision <ArrowRight aria-hidden size={17} />
-            </button>
-          </article>
-        )}
-      </div>
+      ) : (
+        <div className={`grid gap-6 ${presentationRemplie && visionRemplie ? 'lg:grid-cols-2' : ''}`}>
+          {presentationRemplie && (
+            <article className="carte flex flex-col gap-4 p-7 sm:p-10">
+              <p className="surtitre">Qui sommes-nous</p>
+              <h2 id="titre-presentation" className="text-3xl font-bold">
+                {presentation!.title}
+              </h2>
+              <p className="text-[17px] leading-relaxed text-encre-3">{extrait(presentation!.content, 320)}</p>
+              {boutonSuite(undefined, false, 'En savoir plus')}
+            </article>
+          )}
+          {visionRemplie && (
+            <article className="flex flex-col gap-4 rounded-carte bg-vert p-7 text-clair sm:p-10">
+              <p className="text-xs font-semibold tracking-[.12em] text-clair-2 uppercase">Notre vision</p>
+              <h2 className="text-3xl font-bold">{vision!.title}</h2>
+              <Contenu texte={extrait(vision!.content, 320)} className="!text-clair-2" />
+              {boutonSuite('vision', true, 'Lire notre vision')}
+            </article>
+          )}
+        </div>
+      )}
 
       <dialog
         ref={fenetre}

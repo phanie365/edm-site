@@ -74,16 +74,11 @@ create index resource_files_ressource_idx on public.resource_files (resource_id,
 create table public.site_settings (
   id               boolean primary key default true check (id),
   church_name      text not null default 'EDM République Villeurbanne',
-  hero_kicker      text not null default 'Église de maison',
+  hero_kicker      text not null default 'Église de maison République Villeurbanne',
   hero_title       text not null default 'Bienvenue !',
   hero_text        text not null default 'Un espace de communion, d’étude et d’édification autour de la Parole de Dieu.',
   -- 4 points forts sous le visuel d'accueil : [{ "titre": "...", "texte": "..." }]
-  highlights       jsonb not null default '[
-    {"titre": "Une église de maison", "texte": "Texte provisoire – à compléter dans l’administration."},
-    {"titre": "Notre vision",         "texte": "Texte provisoire – à compléter dans l’administration."},
-    {"titre": "La Parole",            "texte": "Texte provisoire – à compléter dans l’administration."},
-    {"titre": "Une famille",          "texte": "Texte provisoire – à compléter dans l’administration."}
-  ]'::jsonb,
+  highlights       jsonb not null default '[]'::jsonb,   -- points forts facultatifs (ajoutés depuis l'admin)
   hero_image_path  text,
   church_image_path text,
   join_image_path  text,
@@ -111,21 +106,14 @@ create table public.site_pages (
   position   int  not null default 0,
   updated_at timestamptz not null default now()
 );
+-- Un texte vide n'apparaît pas sur le site : on complète depuis l'admin (Pages du site).
 insert into public.site_pages (slug, title, position, content) values
-  ('presentation',   'Notre église de maison', 1, 'Texte provisoire – à remplacer depuis l’administration (Pages du site).
-
-Présentez ici votre église de maison : qui vous êtes, ce que vous vivez ensemble.'),
-  ('histoire',       'Notre histoire',          2, 'Texte provisoire – à remplacer depuis l’administration (Pages du site).'),
-  ('vision',         'Notre vision',            3, 'Texte provisoire – à remplacer depuis l’administration (Pages du site).'),
-  ('valeurs',        'Nos valeurs',             4, 'Texte provisoire – à remplacer depuis l’administration (Pages du site).
-
-- Première valeur
-- Deuxième valeur
-- Troisième valeur'),
-  ('fonctionnement', 'Notre fonctionnement',    5, 'Texte provisoire – à remplacer depuis l’administration (Pages du site).'),
-  ('rejoindre',      'Nous rejoindre',          6, 'Partageons ensemble un temps autour de la Parole.
-
-Texte provisoire – ajoutez ici les informations utiles pour une première visite.');
+  ('presentation',   'Notre église de maison', 1, ''),
+  ('histoire',       'Notre histoire',          2, ''),
+  ('vision',         'Notre vision',            3, 'Au sein de l’EDM République, notre vision est de diffuser l’amour.'),
+  ('valeurs',        'Nos valeurs',             4, ''),
+  ('fonctionnement', 'Notre fonctionnement',    5, ''),
+  ('rejoindre',      'Nous rejoindre',          6, 'Partageons ensemble un temps autour de la Parole.');
 
 -- ---------- updated_at automatique ----------
 create function public.maj_updated_at() returns trigger
