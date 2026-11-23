@@ -85,7 +85,7 @@ create table public.site_settings (
   meeting_label    text not null default 'Études bibliques',
   meeting_day      text not null default 'jeudi',
   meeting_time     text not null default '19h30',
-  address          text not null default 'République, Villeurbanne',
+  address          text not null default '61 rue Anatole France, 69100 Villeurbanne',
   address_details  text,
   contact_email    text check (contact_email is null or contact_email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'),
   phone            text check (phone is null or length(phone) <= 30),

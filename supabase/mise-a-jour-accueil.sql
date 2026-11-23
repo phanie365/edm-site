@@ -6,6 +6,7 @@
 -- =====================================================================
 update public.site_settings
    set hero_kicker = 'Église de maison République Villeurbanne',
+       address     = '61 rue Anatole France, 69100 Villeurbanne',
        highlights  = '[]'::jsonb
  where id;
 
