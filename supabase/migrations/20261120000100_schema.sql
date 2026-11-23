@@ -64,7 +64,7 @@ create table public.site_settings (
   meeting_time     text not null default '19h30',
   address          text not null default '61 rue Anatole France, 69100 Villeurbanne',
   address_details  text,
-  contact_email    text check (contact_email is null or contact_email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'),
+  contact_email    text default 'edmrepublique@gmail.com' check (contact_email is null or contact_email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'),
   -- Personnes à contacter : [{ "nom": "Clotilde", "telephone": "06 51 99 94 22" }] (4 maximum)
   contacts         jsonb not null default '[
     {"nom": "Clotilde", "telephone": "06 51 99 94 22"},

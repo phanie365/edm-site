@@ -69,17 +69,19 @@ La bibliothèque est vide au départ : ajoutez vos ressources depuis l'admin (se
 
 ## 4. Créer le premier administrateur
 
-La connexion à `/admin` se fait avec un **identifiant** (par exemple `clotilde`) et un **mot de passe** que vous choisissez.
+La connexion à `/admin` se fait avec l'email **edmrepublique@gmail.com** et un **mot de passe** que vous choisissez. Ce même email est affiché comme contact sur le site.
 
 1. Dans Supabase, allez dans **Authentication → Users**, puis **Add user** → **Create new user**.
 2. Remplissez :
-   - **Email** : votre identifiant suivi de `@edm-republique.local`, par exemple `clotilde@edm-republique.local`. Ce n'est pas une vraie adresse, c'est juste la forme attendue par Supabase. Un vrai email fonctionne aussi ; vous vous connecterez alors avec cet email.
-   - **Password** : un mot de passe solide, de 12 caractères ou plus.
-   - Cochez **Auto Confirm User**.
-3. Ouvrez `supabase/creer_admin.sql`, remplacez `clotilde` par votre identifiant, puis exécutez-le dans le **SQL Editor**. Le résultat doit afficher l'identifiant.
-4. Sur `/admin`, connectez-vous avec l'**identifiant** (ex. `clotilde`) et le **mot de passe**.
+   - **Email** : `edmrepublique@gmail.com` (sans accent : une adresse Gmail n'en contient jamais) ;
+   - **Password** : un mot de passe solide, de 12 caractères ou plus ;
+   - cochez **Auto Confirm User**.
+3. Exécutez `supabase/creer_admin.sql` dans le **SQL Editor**. Le résultat doit afficher l'email.
+4. Sur `/admin`, connectez-vous avec cet email et ce mot de passe.
 
-Pour ajouter un autre administrateur, refaites ces étapes avec son identifiant. Pour changer un mot de passe oublié avec un identifiant (sans vraie adresse email), supprimez l'utilisateur dans Supabase et recréez-le.
+**Mot de passe oublié :** supprimez l'utilisateur dans Supabase (**Authentication → Users → ⋯ → Delete user**), recréez-le avec un nouveau mot de passe, puis relancez `creer_admin.sql`.
+
+**Autre administrateur :** même démarche avec son email, en remplaçant l'adresse dans `creer_admin.sql`. Un identifiant sans vraie adresse fonctionne aussi : `prenom@edm-republique.local`, avec lequel on se connecte en tapant simplement `prenom`.
 
 ---
 
@@ -143,7 +145,7 @@ Le message « Votre message a bien été envoyé » ne s'affiche **que si Resend
 
 ## 7. Utiliser l'administration
 
-Rendez-vous sur `/admin` et connectez-vous avec votre identifiant et votre mot de passe. Sur téléphone, le menu s'ouvre avec le bouton ☰.
+Rendez-vous sur `/admin` et connectez-vous avec votre email et votre mot de passe. Sur téléphone, le menu s'ouvre avec le bouton ☰.
 
 ### Ressources (la bibliothèque)
 
@@ -175,6 +177,7 @@ L'administration sert uniquement à gérer la **bibliothèque** (ressources et f
 | Rencontre | Études bibliques, chaque jeudi à partir de 19h30 | `site_settings.meeting_*` |
 | Adresse | 61 rue Anatole France, 69100 Villeurbanne | `site_settings.address` |
 | Contacts | Clotilde · 06 51 99 94 22 ; Ephrem · 07 87 07 20 22 | `site_settings.contacts` |
+| Email de contact | edmrepublique@gmail.com | `site_settings.contact_email` |
 | Photo de l'accueil | `public/assets/accueil.jpg` | fichier du site |
 
 > En cas d'erreur dans un formulaire, ce que vous avez tapé est conservé : corrigez le champ signalé en rouge et enregistrez à nouveau.
@@ -200,8 +203,8 @@ C'est **facultatif** : le site fonctionne normalement dans le navigateur.
 
 | Problème | Solution |
 |---|---|
-| « Identifiant ou mot de passe incorrect » | Vérifiez l'identifiant (sans « @… ») et le mot de passe. En cas d'oubli : supprimez puis recréez l'utilisateur dans Supabase (section 4). |
-| « Ce compte n'a pas accès à l'administration » | Exécutez `creer_admin.sql` avec cet identifiant (section 4). |
+| « Identifiant ou mot de passe incorrect » | Vérifiez l'email et le mot de passe. En cas d'oubli : supprimez puis recréez l'utilisateur dans Supabase (section 4). |
+| « Ce compte n'a pas accès à l'administration » | Exécutez `creer_admin.sql` (section 4). |
 | Le site affiche « Le contenu n'a pas pu être chargé » | Supabase est peut-être en pause (voir ci-dessus), ou les variables Vercel sont incorrectes. |
 | Une ressource n'apparaît pas | Vérifiez qu'elle est **publiée**. |
 

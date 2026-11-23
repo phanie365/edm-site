@@ -1,26 +1,21 @@
 -- =====================================================================
--- Créer un administrateur (connexion avec un IDENTIFIANT + mot de passe)
+-- Déclarer un administrateur
 --
 -- 1. Supabase > Authentication > Users > « Add user » > « Create new user »
---      Email    : <identifiant>@edm-republique.local   (ex. clotilde@edm-republique.local)
+--      Email    : edmrepublique@gmail.com
 --      Password : le mot de passe de votre choix (12 caractères ou plus)
 --      Cochez « Auto Confirm User »
---    (Un vrai email fonctionne aussi : la connexion se fait alors avec cet email.)
+-- 2. Exécutez ce script (SQL Editor > New query > Run).
+-- 3. Sur /admin, connectez-vous avec cet email et ce mot de passe.
 --
--- 2. Remplacez « clotilde » ci-dessous par l'identifiant choisi, puis « Run ».
---
--- 3. Sur /admin, connectez-vous avec l'identifiant (ex. « clotilde ») et le mot de passe.
---
--- Pour retirer un administrateur :
---   delete from public.admins where user_id = (select id from auth.users where email = 'clotilde@edm-republique.local');
--- Pour changer un mot de passe : Authentication > Users > ⋯ > « Reset password » n'envoie un email
--- qu'aux vraies adresses ; pour un identifiant, supprimez puis recréez l'utilisateur (étape 1 et 2).
+-- Mot de passe oublié : supprimez l'utilisateur (Authentication > Users > ⋯ > Delete user),
+-- recréez-le (étape 1) avec un nouveau mot de passe, puis relancez ce script.
+-- Autre administrateur : même démarche avec son email, en remplaçant l'adresse ci-dessous.
 -- =====================================================================
 
 insert into public.admins (user_id)
-select id from auth.users where email = 'clotilde@edm-republique.local'
+select id from auth.users where email = 'edmrepublique@gmail.com'
 on conflict do nothing;
 
--- Vérification : doit afficher le compte
-select replace(u.email, '@edm-republique.local', '') as identifiant
-from public.admins a join auth.users u on u.id = a.user_id;
+-- Vérification : doit afficher l'email
+select u.email from public.admins a join auth.users u on u.id = a.user_id;

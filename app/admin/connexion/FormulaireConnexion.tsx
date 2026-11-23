@@ -15,7 +15,7 @@ export function FormulaireConnexion() {
       )}
       <div className="space-y-2">
         <label htmlFor="identifiant" className="font-semibold">
-          Identifiant
+          Email
         </label>
         <input
           id="identifiant"
@@ -31,7 +31,7 @@ export function FormulaireConnexion() {
           aria-invalid={e.identifiant ? true : undefined}
         />
         <p id="identifiant-aide" className="text-sm text-encre-2">
-          Votre nom d’utilisateur (ex. clotilde) ou votre email.
+          L’email du compte administrateur (ou un identifiant).
         </p>
         {e.identifiant && <p className="text-sm text-erreur">{e.identifiant}</p>}
       </div>
