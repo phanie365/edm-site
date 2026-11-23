@@ -45,7 +45,7 @@ export default async function ModifierRessource({
           ) : undefined
         }
       />
-      {cree && <Retour resultat={{ ok: true, message: 'Ressource créée. Ajoutez maintenant les fiches PDF et une image si besoin.' }} className="mb-6" />}
+      {cree && <Retour resultat={{ ok: true, message: 'Ressource créée. Ajoutez maintenant les fiches (une image par fiche) et une couverture si besoin.' }} className="mb-6" />}
 
       <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr] xl:items-start">
         <FormulaireRessource ressource={ressource} />
@@ -61,7 +61,7 @@ export default async function ModifierRessource({
           </section>
           <section className="carte border-erreur/40 p-5 sm:p-7">
             <h2 className="text-lg font-bold">Supprimer la ressource</h2>
-            <p className="mt-1 mb-4 text-sm text-encre-3">Supprime aussi toutes ses fiches PDF et son image. Cette action est définitive.</p>
+            <p className="mt-1 mb-4 text-sm text-encre-3">Supprime aussi toutes ses fiches et son image. Cette action est définitive.</p>
             <BoutonSupprimerRessource id={ressource.id} titre={ressource.title} />
           </section>
         </div>

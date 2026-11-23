@@ -35,6 +35,9 @@ describe('schemaFiche', () => {
   it.each([`ressources/autre/${id}.pdf`, `ressources/${id}/../x.pdf`, `ressources/${id}/${id}.exe`, '/etc/passwd'])('refuse le chemin %s', (chemin) => {
     expect(schemaFiche.safeParse({ resource_id: id, storage_path: chemin, file_name: 'x', size_bytes: 10 }).success).toBe(false);
   });
+  it('accepte une fiche image', () => {
+    expect(schemaFiche.safeParse({ resource_id: id, storage_path: `ressources/${id}/${id}.jpg`, file_name: 'Fiche 1', size_bytes: 1000 }).success).toBe(true);
+  });
   it('refuse un fichier de plus de 25 Mo', () => {
     expect(schemaFiche.safeParse({ resource_id: id, storage_path: `ressources/${id}/${id}.pdf`, file_name: 'x', size_bytes: 26 * 1024 * 1024 }).success).toBe(false);
   });

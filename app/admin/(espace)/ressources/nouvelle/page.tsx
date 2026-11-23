@@ -14,7 +14,7 @@ export default async function NouvelleRessource() {
       <Link href="/admin/ressources" className="mb-4 -ml-2 inline-flex min-h-11 items-center gap-2 rounded-lg px-2 font-semibold hover:bg-papier-2">
         <ArrowLeft aria-hidden size={18} /> Ressources
       </Link>
-      <TitreAdmin titre="Nouvelle ressource" sousTitre="Vous pourrez ajouter les fiches PDF et l’image juste après l’enregistrement." />
+      <TitreAdmin titre="Nouvelle ressource" sousTitre="Vous pourrez ajouter les fiches (images) et la couverture juste après l’enregistrement." />
       <FormulaireRessource />
     </>
   );

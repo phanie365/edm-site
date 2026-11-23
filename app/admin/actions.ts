@@ -156,10 +156,10 @@ export async function supprimerRessource(id: string): Promise<Resultat> {
   redirect('/admin/ressources?supprimee=1');
 }
 
-/* =========================== Fiches PDF =========================== */
+/* =========================== Fiches (images ou PDF) =========================== */
 
-/** Vérifie dans Storage que le fichier existe bien et que c'est un PDF ; renvoie sa taille réelle. */
-async function verifierObjetPdf(supabase: Awaited<ReturnType<typeof clientSession>>, chemin: string) {
+/** Vérifie dans Storage que le fichier existe bien et que son type correspond à son extension ; renvoie sa taille réelle. */
+async function verifierObjetFiche(supabase: Awaited<ReturnType<typeof clientSession>>, chemin: string) {
   const dossier = chemin.slice(0, chemin.lastIndexOf('/'));
   const nom = chemin.slice(chemin.lastIndexOf('/') + 1);
   const { data, error } = await supabase.storage.from(BUCKET_FICHES).list(dossier, { search: nom, limit: 1 });
@@ -167,7 +167,8 @@ async function verifierObjetPdf(supabase: Awaited<ReturnType<typeof clientSessio
   const objet = data?.find((o) => o.name === nom);
   if (!objet) throw new Error('Le fichier déposé est introuvable. Réessayez.');
   const meta = (objet.metadata ?? {}) as { mimetype?: string; size?: number };
-  if (meta.mimetype && meta.mimetype !== 'application/pdf') throw new Error('Seuls les fichiers PDF sont acceptés.');
+  const attendu = { pdf: 'application/pdf', jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp' }[nom.slice(nom.lastIndexOf('.') + 1)];
+  if (meta.mimetype && meta.mimetype !== attendu) throw new Error('Format de fichier refusé.');
   return typeof meta.size === 'number' ? meta.size : null;
 }
 
@@ -176,7 +177,7 @@ export async function ajouterFiche(entree: z.input<typeof schemaFiche>): Promise
   if (!verif.success) return KO(verif.error.issues[0]?.message ?? 'Données invalides.');
   try {
     const { supabase } = await exigerAdminAction();
-    const taille = await verifierObjetPdf(supabase, verif.data.storage_path);
+    const taille = await verifierObjetFiche(supabase, verif.data.storage_path);
     const { data: dernier } = await supabase
       .from('resource_files')
       .select('display_order')
@@ -223,7 +224,7 @@ export async function remplacerFiche(id: string, nouveauChemin: string, tailleCl
     if (e1) throw e1;
     const verif = schemaFiche.safeParse({ resource_id: f.resource_id, storage_path: nouveauChemin, file_name: f.file_name, size_bytes: tailleClient });
     if (!verif.success) return KO(verif.error.issues[0]?.message ?? 'Fichier invalide.');
-    const taille = await verifierObjetPdf(supabase, nouveauChemin);
+    const taille = await verifierObjetFiche(supabase, nouveauChemin);
     const { error } = await supabase.from('resource_files').update({ storage_path: nouveauChemin, size_bytes: taille ?? tailleClient }).eq('id', f.id);
     if (error) throw error;
     await supabase.storage.from(BUCKET_FICHES).remove([f.storage_path]);
@@ -231,7 +232,7 @@ export async function remplacerFiche(id: string, nouveauChemin: string, tailleCl
     return KO(traduire(e));
   }
   rafraichirSite();
-  return OK('PDF remplacé.');
+  return OK('Fiche remplacée.');
 }
 
 export async function supprimerFiche(id: string): Promise<Resultat> {

@@ -20,7 +20,7 @@ export default async function TableauDeBord() {
   const publiees = liste.filter((r) => r.is_published).length;
   const stats = [
     { libelle: 'Ressources publiées', valeur: publiees, detail: `${liste.length - publiees} non publiée${liste.length - publiees > 1 ? 's' : ''}`, icone: FolderOpen },
-    { libelle: 'Fiches PDF', valeur: fiches.count ?? 0, icone: FileText },
+    { libelle: 'Fiches', valeur: fiches.count ?? 0, icone: FileText },
   ];
 
   return (

@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Bibliothèque',
-  description: 'Prédications, enseignements et fiches PDF à consulter et télécharger librement, sans inscription.',
+  description: 'Prédications, enseignements et fiches à consulter et télécharger librement, sans inscription.',
   alternates: { canonical: '/bibliotheque' },
   openGraph: { title: 'Bibliothèque', url: '/bibliotheque' },
 };

@@ -9,7 +9,7 @@ import { Contenu } from '@/components/Contenu';
 import { Conteneur, Etiquette } from '@/components/ui';
 import { lireRessource } from '@/lib/donnees';
 import { dateLongue, extrait, idYoutube } from '@/lib/outils';
-import { urlImage, urlPdf, urlPdfTelechargement } from '@/lib/stockage';
+import { ficheEstImage, urlFiche, urlFicheTelechargement, urlImage } from '@/lib/stockage';
 
 export const dynamic = 'force-dynamic';
 
@@ -84,7 +84,7 @@ export default async function DetailRessource({ params }: { params: Params }) {
         {fiches.length > 0 && (
           <section aria-labelledby="titre-fiches" className="mt-10">
             <h2 id="titre-fiches" className="mb-4 text-2xl font-bold">
-              Fiches disponibles ({fiches.length})
+              Fiches ({fiches.length})
             </h2>
             <ListeFiches
               titreRessource={r.title}
@@ -92,8 +92,9 @@ export default async function DetailRessource({ params }: { params: Params }) {
                 id: f.id,
                 nom: f.file_name,
                 taille: f.size_bytes,
-                urlConsulter: urlPdf(f.storage_path),
-                urlTelecharger: urlPdfTelechargement(f.storage_path, f.file_name),
+                image: ficheEstImage(f.storage_path),
+                urlConsulter: urlFiche(f.storage_path),
+                urlTelecharger: urlFicheTelechargement(f.storage_path, f.file_name),
               }))}
             />
           </section>

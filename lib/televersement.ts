@@ -15,7 +15,7 @@ async function commencePar(fichier: File, octets: number[]): Promise<boolean> {
 }
 
 export async function verifierPdf(fichier: File): Promise<string | null> {
-  if (!/\.pdf$/i.test(fichier.name) && fichier.type !== 'application/pdf') return `« ${fichier.name} » n’est pas un PDF.`;
+  if (!/\.pdf$/i.test(fichier.name) && fichier.type !== 'application/pdf') return `« ${fichier.name} » : format non accepté (image JPEG, PNG, WebP ou PDF).`;
   if (fichier.size > TAILLE_MAX_PDF) return `« ${fichier.name} » est trop lourd (25 Mo maximum).`;
   if (fichier.size === 0) return `« ${fichier.name} » est vide.`;
   if (!(await commencePar(fichier, [0x25, 0x50, 0x44, 0x46, 0x2d]))) return `« ${fichier.name} » n’est pas un PDF valide.`;
@@ -36,21 +36,61 @@ export async function verifierImage(fichier: File): Promise<string | null> {
   return null;
 }
 
-/** Nom lisible tiré du fichier : « 01_la-foi.pdf » → « 01 la foi » */
+/** Nom lisible tiré du fichier : « 01_la-foi.jpg » → « 01 la foi » */
 export const nomDepuisFichier = (nom: string) =>
-  nom.replace(/\.pdf$/i, '').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160) || 'Fiche';
+  nom.replace(/\.(pdf|jpe?g|png|webp)$/i, '').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160) || 'Fiche';
 
-export async function deposerPdf(ressourceId: string, fichier: File): Promise<{ chemin: string } | { erreur: string }> {
-  const probleme = await verifierPdf(fichier);
-  if (probleme) return { erreur: probleme };
-  const chemin = `ressources/${ressourceId}/${crypto.randomUUID()}.pdf`;
+const COTE_MAX_FICHE = 2400; // pixels : assez pour lire une fiche zoomée, sans fichier énorme
+const POIDS_SANS_REDUCTION = 2.5 * 1024 * 1024;
+
+/** Réduit les photos très lourdes (téléphone) en JPEG de bonne qualité ; laisse les autres intactes. */
+async function reduireSiBesoin(fichier: File): Promise<File> {
+  try {
+    const bitmap = await createImageBitmap(fichier, { imageOrientation: 'from-image' });
+    const echelle = Math.min(1, COTE_MAX_FICHE / Math.max(bitmap.width, bitmap.height));
+    if (echelle === 1 && fichier.size <= POIDS_SANS_REDUCTION) {
+      bitmap.close();
+      return fichier;
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bitmap.width * echelle);
+    canvas.height = Math.round(bitmap.height * echelle);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return fichier;
+    ctx.fillStyle = '#ffffff'; // fond blanc pour les images transparentes
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    const blob = await new Promise<Blob | null>((ok) => canvas.toBlob(ok, 'image/jpeg', 0.88));
+    if (!blob || blob.size >= fichier.size) return fichier;
+    return new File([blob], fichier.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+  } catch {
+    return fichier;
+  }
+}
+
+/** Dépose une fiche : une image (JPEG, PNG, WebP) ou un PDF. */
+export async function deposerFiche(ressourceId: string, original: File): Promise<{ chemin: string; taille: number } | { erreur: string }> {
+  let fichier = original;
+  let ext = 'pdf';
+  if (original.type.startsWith('image/')) {
+    if (!TYPES_IMAGES[original.type]) return { erreur: `« ${original.name} » : format non accepté (JPEG, PNG ou WebP).` };
+    if (!(await commencePar(original, TYPES_IMAGES[original.type]!.signature))) return { erreur: `« ${original.name} » n’est pas une image valide.` };
+    fichier = await reduireSiBesoin(original);
+    if (fichier.size > TAILLE_MAX_PDF) return { erreur: `« ${original.name} » est trop lourd (25 Mo maximum).` };
+    ext = TYPES_IMAGES[fichier.type]!.ext;
+  } else {
+    const probleme = await verifierPdf(original);
+    if (probleme) return { erreur: probleme };
+  }
+  const chemin = `ressources/${ressourceId}/${crypto.randomUUID()}.${ext}`;
   const { error } = await clientNavigateur().storage.from(BUCKET_FICHES).upload(chemin, fichier, {
-    contentType: 'application/pdf',
+    contentType: fichier.type || 'application/pdf',
     cacheControl: '31536000',
     upsert: false,
   });
-  if (error) return { erreur: traduireStockage(error.message, fichier.name) };
-  return { chemin };
+  if (error) return { erreur: traduireStockage(error.message, original.name) };
+  return { chemin, taille: fichier.size };
 }
 
 export async function deposerImage(dossier: 'couvertures' | 'site', fichier: File): Promise<{ chemin: string } | { erreur: string }> {

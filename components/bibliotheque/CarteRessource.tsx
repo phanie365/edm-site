@@ -21,7 +21,7 @@ function Meta({ r }: { r: ApercuRessource }) {
       <span>{morceaux.join(' · ') || 'Ressource'}</span>
       <span className="ml-auto flex items-center gap-1.5">
         {r.youtube_url && <SquarePlay aria-label="Vidéo" role="img" size={18} className="text-youtube" />}
-        {r.nb_fiches > 0 && <FileText aria-label="Fiches PDF" role="img" size={17} />}
+        {r.nb_fiches > 0 && <FileText aria-label="Fiches" role="img" size={17} />}
       </span>
     </p>
   );

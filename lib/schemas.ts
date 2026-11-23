@@ -29,7 +29,7 @@ export const schemaFiche = z
     file_name: z.string().trim().min(1, 'Le nom de la fiche est obligatoire.').max(160),
     size_bytes: z.number().int().positive().max(25 * 1024 * 1024),
   })
-  .refine((f) => new RegExp(`^ressources/${f.resource_id}/[0-9a-f-]{36}\\.pdf$`).test(f.storage_path), {
+  .refine((f) => new RegExp(`^ressources/${f.resource_id}/[0-9a-f-]{36}\\.(pdf|jpg|png|webp)$`).test(f.storage_path), {
     message: 'Chemin de fichier invalide.',
     path: ['storage_path'],
   });

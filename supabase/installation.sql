@@ -1,7 +1,7 @@
 -- =====================================================================
 -- EDM République Villeurbanne – INSTALLATION COMPLÈTE DE LA BASE
 -- À copier-coller UNE SEULE FOIS dans Supabase > SQL Editor, puis « Run ».
--- (Regroupe les 3 fichiers de supabase/migrations/, dans l'ordre.)
+-- (Regroupe les 4 fichiers de supabase/migrations/, dans l'ordre.)
 -- =====================================================================
 
 
@@ -121,6 +121,7 @@ create trigger resources_maj     before update on public.resources     for each 
 create trigger site_settings_maj before update on public.site_settings for each row execute function public.maj_updated_at();
 create trigger site_pages_maj    before update on public.site_pages    for each row execute function public.maj_updated_at();
 
+
 -- ---------------------------------------------------------------------
 -- 20261120000200_securite.sql
 -- ---------------------------------------------------------------------
@@ -222,6 +223,7 @@ end $$;
 revoke execute on function public.reordonner_fiches(uuid, uuid[]) from public, anon;
 grant  execute on function public.reordonner_fiches(uuid, uuid[]) to authenticated;
 
+
 -- ---------------------------------------------------------------------
 -- 20261120000300_stockage.sql
 -- ---------------------------------------------------------------------
@@ -249,3 +251,20 @@ create policy "admin remplace des fichiers" on storage.objects for update to aut
   with check (bucket_id in ('fiches', 'images') and (select public.is_admin()));
 create policy "admin supprime des fichiers" on storage.objects for delete to authenticated
   using (bucket_id in ('fiches', 'images') and (select public.is_admin()));
+
+
+-- ---------------------------------------------------------------------
+-- 20261123000100_fiches_images.sql
+-- ---------------------------------------------------------------------
+-- =====================================================================
+-- 4/4 : les fiches peuvent être des images (JPEG, PNG, WebP), une image par fiche.
+--   Les PDF restent acceptés.
+-- =====================================================================
+
+alter table public.resource_files drop constraint if exists resource_files_storage_path_check;
+alter table public.resource_files add constraint resource_files_storage_path_check
+  check (storage_path ~ '^ressources/[0-9a-f-]{36}/[0-9a-f-]{36}\.(pdf|jpg|png|webp)$');
+
+update storage.buckets
+set allowed_mime_types = array['application/pdf', 'image/jpeg', 'image/png', 'image/webp']
+where id = 'fiches';
