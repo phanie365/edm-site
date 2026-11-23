@@ -54,7 +54,6 @@ export default async function ModifierRessource({
           <GestionFiches ressourceId={ressource.id} fiches={(fiches ?? []) as FichePdf[]} />
           <section className="carte p-5 sm:p-7">
             <ChoixImage
-              cible="cover"
               ressourceId={ressource.id}
               chemin={ressource.cover_path}
               titre="Image de couverture"

@@ -10,8 +10,6 @@ import {
   schemaCategorie,
   schemaFiche,
   schemaImage,
-  schemaPage,
-  schemaReglages,
   schemaRessource,
 } from '@/lib/schemas';
 import { clientSession } from '@/lib/supabase/serveur';
@@ -265,32 +263,21 @@ export async function reordonnerFiches(ressourceId: string, ids: string[]): Prom
   return OK('Ordre des fiches enregistré.');
 }
 
-/* =========================== Images =========================== */
+/* =========================== Image de couverture =========================== */
 
-const COLONNES_IMAGES = { hero: 'hero_image_path', church: 'church_image_path', join: 'join_image_path' } as const;
-
-/** Associe (ou retire, si chemin null) une image déjà déposée dans Storage. */
-export async function definirImage(cible: 'cover' | 'hero' | 'church' | 'join', chemin: string | null, ressourceId?: string): Promise<Resultat> {
+/** Associe (ou retire, si chemin null) l'image de couverture d'une ressource, déjà déposée dans Storage. */
+export async function definirCouverture(ressourceId: string, chemin: string | null): Promise<Resultat> {
   if (chemin !== null) {
-    const verif = schemaImage.safeParse({ cible, storage_path: chemin, resource_id: ressourceId });
+    const verif = schemaImage.safeParse({ resource_id: ressourceId, storage_path: chemin });
     if (!verif.success) return KO(verif.error.issues[0]?.message ?? 'Image invalide.');
   }
   try {
     const { supabase } = await exigerAdminAction();
-    let ancien: string | null = null;
-    if (cible === 'cover') {
-      const id = z.string().uuid().parse(ressourceId);
-      const { data } = await supabase.from('resources').select('cover_path').eq('id', id).single();
-      ancien = data?.cover_path ?? null;
-      const { error } = await supabase.from('resources').update({ cover_path: chemin }).eq('id', id);
-      if (error) throw error;
-    } else {
-      const colonne = COLONNES_IMAGES[cible];
-      const { data } = await supabase.from('site_settings').select(colonne).single();
-      ancien = (data as Record<string, string | null> | null)?.[colonne] ?? null;
-      const { error } = await supabase.from('site_settings').update({ [colonne]: chemin }).eq('id', true);
-      if (error) throw error;
-    }
+    const id = z.string().uuid().parse(ressourceId);
+    const { data } = await supabase.from('resources').select('cover_path').eq('id', id).single();
+    const ancien = data?.cover_path ?? null;
+    const { error } = await supabase.from('resources').update({ cover_path: chemin }).eq('id', id);
+    if (error) throw error;
     if (ancien && ancien !== chemin) await supabase.storage.from(BUCKET_IMAGES).remove([ancien]);
   } catch (e) {
     return KO(traduire(e));
@@ -342,56 +329,4 @@ export async function supprimerCategorie(id: string): Promise<Resultat> {
   }
   rafraichirSite();
   return OK('Catégorie supprimée. Les ressources concernées n’ont plus de catégorie.');
-}
-
-/* =========================== Informations et pages =========================== */
-
-export async function enregistrerReglages(_avant: Resultat | null, formData: FormData): Promise<Resultat> {
-  const highlights = [0, 1, 2, 3]
-    .map((i) => ({ titre: String(formData.get(`hl_titre_${i}`) ?? ''), texte: String(formData.get(`hl_texte_${i}`) ?? '') }))
-    .filter((h) => h.titre.trim() || h.texte.trim());
-  const verif = schemaReglages.safeParse({
-    church_name: formData.get('church_name') ?? '',
-    hero_kicker: formData.get('hero_kicker') ?? '',
-    hero_title: formData.get('hero_title') ?? '',
-    hero_text: formData.get('hero_text') ?? '',
-    highlights,
-    meeting_label: formData.get('meeting_label') ?? '',
-    meeting_day: formData.get('meeting_day') ?? '',
-    meeting_time: formData.get('meeting_time') ?? '',
-    address: formData.get('address') ?? '',
-    address_details: formData.get('address_details') ?? '',
-    contact_email: formData.get('contact_email') ?? '',
-    contacts: [0, 1, 2, 3]
-      .map((i) => ({ nom: String(formData.get(`contact_nom_${i}`) ?? ''), telephone: String(formData.get(`contact_tel_${i}`) ?? '') }))
-      .filter((c) => c.nom.trim() || c.telephone.trim()),
-    whatsapp_url: formData.get('whatsapp_url') ?? '',
-  });
-  if (!verif.success) return KO('Merci de corriger les champs indiqués.', erreursParChamp(verif.error));
-  try {
-    const { supabase } = await exigerAdminAction();
-    const { error } = await supabase.from('site_settings').update(verif.data).eq('id', true);
-    if (error) throw error;
-  } catch (e) {
-    return KO(traduire(e));
-  }
-  rafraichirSite();
-  return OK('Informations enregistrées. Le site est à jour.');
-}
-
-export async function enregistrerPage(_avant: Resultat | null, formData: FormData): Promise<Resultat> {
-  const verif = schemaPage.safeParse({ slug: formData.get('slug'), title: formData.get('title') ?? '', content: formData.get('content') ?? '' });
-  if (!verif.success) return KO('Merci de corriger les champs indiqués.', erreursParChamp(verif.error));
-  try {
-    const { supabase } = await exigerAdminAction();
-    const { error } = await supabase
-      .from('site_pages')
-      .update({ title: verif.data.title, content: verif.data.content })
-      .eq('slug', verif.data.slug);
-    if (error) throw error;
-  } catch (e) {
-    return KO(traduire(e));
-  }
-  rafraichirSite();
-  return OK('Texte enregistré. Le site est à jour.');
 }

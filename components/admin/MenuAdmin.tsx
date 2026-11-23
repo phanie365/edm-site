@@ -3,15 +3,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { ExternalLink, FileText, FolderOpen, Info, LayoutDashboard, LogOut, Menu, Tags, X } from 'lucide-react';
+import { ExternalLink, FolderOpen, LayoutDashboard, LogOut, Menu, Tags, X } from 'lucide-react';
 import { seDeconnecter } from '@/app/admin/actions';
 
 const LIENS = [
   { href: '/admin', libelle: 'Tableau de bord', icone: LayoutDashboard },
   { href: '/admin/ressources', libelle: 'Ressources', icone: FolderOpen },
   { href: '/admin/categories', libelle: 'Catégories', icone: Tags },
-  { href: '/admin/pages', libelle: 'Pages du site', icone: FileText },
-  { href: '/admin/informations', libelle: 'Informations', icone: Info },
 ];
 
 const actif = (href: string, chemin: string) => (href === '/admin' ? chemin === '/admin' : chemin.startsWith(href));

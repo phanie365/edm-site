@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { erreursParChamp, schemaContact, schemaFiche, schemaImage, schemaReglages, schemaRessource } from '../lib/schemas';
+import { erreursParChamp, schemaContact, schemaFiche, schemaImage, schemaRessource } from '../lib/schemas';
 
 const ressourceValide = {
   title: 'La foi',
@@ -44,46 +44,12 @@ describe('schemaFiche', () => {
 });
 
 describe('schemaImage', () => {
-  it('n’accepte que des images dans les bons dossiers', () => {
+  it('n’accepte que des couvertures, au bon format', () => {
     const id = '3f2b8c1e-4d5a-4b6c-9d8e-7f6a5b4c3d2e';
-    expect(schemaImage.safeParse({ cible: 'hero', storage_path: `site/${id}.webp` }).success).toBe(true);
-    expect(schemaImage.safeParse({ cible: 'hero', storage_path: `site/${id}.svg` }).success).toBe(false);
-    expect(schemaImage.safeParse({ cible: 'hero', storage_path: `../${id}.png` }).success).toBe(false);
-  });
-});
-
-describe('schemaReglages', () => {
-  const base = {
-    church_name: 'EDM',
-    hero_kicker: '',
-    hero_title: 'Bienvenue',
-    hero_text: '',
-    highlights: [],
-    meeting_label: 'Études bibliques',
-    meeting_day: 'jeudi',
-    meeting_time: '19h30',
-    address: 'République, Villeurbanne',
-    address_details: '',
-    contact_email: '',
-    contacts: [],
-    whatsapp_url: '',
-  };
-  it('accepte des coordonnées vides', () => expect(schemaReglages.safeParse(base).success).toBe(true));
-  it('valide email et WhatsApp', () => {
-    expect(schemaReglages.safeParse({ ...base, contact_email: 'pas-un-email' }).success).toBe(false);
-    expect(schemaReglages.safeParse({ ...base, whatsapp_url: 'https://exemple.fr' }).success).toBe(false);
-    expect(schemaReglages.safeParse({ ...base, whatsapp_url: 'https://wa.me/33600000000' }).success).toBe(true);
-  });
-  it('valide les contacts (prénom + numéro), 4 maximum', () => {
-    const c = { nom: 'Clotilde', telephone: '06 51 99 94 22' };
-    expect(schemaReglages.safeParse({ ...base, contacts: [c, { nom: 'Ephrem', telephone: '07 87 07 20 22' }] }).success).toBe(true);
-    expect(schemaReglages.safeParse({ ...base, contacts: [{ nom: '', telephone: '0651999422' }] }).success).toBe(false);
-    expect(schemaReglages.safeParse({ ...base, contacts: [{ nom: 'X', telephone: 'abc' }] }).success).toBe(false);
-    expect(schemaReglages.safeParse({ ...base, contacts: [c, c, c, c, c] }).success).toBe(false);
-  });
-  it('limite à 4 points forts', () => {
-    const p = { titre: 'a', texte: 'b' };
-    expect(schemaReglages.safeParse({ ...base, highlights: [p, p, p, p, p] }).success).toBe(false);
+    expect(schemaImage.safeParse({ resource_id: id, storage_path: `couvertures/${id}.webp` }).success).toBe(true);
+    expect(schemaImage.safeParse({ resource_id: id, storage_path: `site/${id}.jpg` }).success).toBe(false);
+    expect(schemaImage.safeParse({ resource_id: id, storage_path: `couvertures/${id}.svg` }).success).toBe(false);
+    expect(schemaImage.safeParse({ resource_id: id, storage_path: `../${id}.png` }).success).toBe(false);
   });
 });
 

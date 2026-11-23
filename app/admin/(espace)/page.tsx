@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FileText, FolderOpen, PencilLine, Plus, Tags } from 'lucide-react';
+import { BookOpen, FileText, FolderOpen, PencilLine, Plus, Tags } from 'lucide-react';
 import { TitreAdmin } from '@/components/admin/Retour';
 import { exigerAdminPage } from '@/lib/auth';
 import { ilYa } from '@/lib/outils';
@@ -87,14 +87,14 @@ export default async function TableauDeBord() {
           Raccourcis
         </h2>
         <div className="grid gap-3 sm:grid-cols-3">
-          <Link href="/admin/pages" className="carte flex min-h-20 items-center gap-3 p-5 font-semibold hover:border-vert">
-            <FileText aria-hidden size={20} /> Modifier les textes du site
-          </Link>
-          <Link href="/admin/informations" className="carte flex min-h-20 items-center gap-3 p-5 font-semibold hover:border-vert">
-            <PencilLine aria-hidden size={20} /> Adresse, horaires, contact
+          <Link href="/admin/ressources/nouvelle" className="carte flex min-h-20 items-center gap-3 p-5 font-semibold hover:border-vert">
+            <Plus aria-hidden size={20} /> Ajouter une ressource
           </Link>
           <Link href="/admin/categories" className="carte flex min-h-20 items-center gap-3 p-5 font-semibold hover:border-vert">
             <Tags aria-hidden size={20} /> Gérer les catégories
+          </Link>
+          <Link href="/bibliotheque" target="_blank" className="carte flex min-h-20 items-center gap-3 p-5 font-semibold hover:border-vert">
+            <BookOpen aria-hidden size={20} /> Voir la bibliothèque<span className="sr-only"> (nouvel onglet)</span>
           </Link>
         </div>
       </section>

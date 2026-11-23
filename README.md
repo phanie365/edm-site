@@ -67,7 +67,7 @@ Les scripts sont dans le dossier **`supabase/migrations/`**. Pour chacun, **dans
 | 2 | `20261120000200_securite.sql` | la sécurité : les visiteurs ne peuvent que lire le contenu publié |
 | 3 | `20261120000300_stockage.sql` | les espaces de stockage des PDF et des photos |
 
-> Les textes de présentation sont créés avec la mention **« Texte provisoire »**. Remplacez-les depuis l'admin (section 7). La bibliothèque est vide au départ : ajoutez vos ressources depuis l'admin.
+> La bibliothèque est vide au départ : ajoutez vos ressources depuis l'admin (section 7).
 
 ---
 
@@ -169,18 +169,19 @@ Elles servent de filtres dans la bibliothèque (par exemple : Prédications, Ens
 - **Renommer :** modifiez le nom, puis cliquez ailleurs.
 - **Supprimer :** les ressources concernées restent en ligne, simplement sans catégorie.
 
-### Pages du site
+### Ce qui ne se modifie pas depuis l'admin
 
-Ce sont les textes de présentation de l'église (présentation, histoire, vision, valeurs, fonctionnement) et de **Nous rejoindre**. Sur l'accueil, la présentation et la vision apparaissent en résumé ; le bouton **« En savoir plus »** ouvre une fenêtre avec tous les textes. Un aperçu s'affiche à côté du texte pendant que vous écrivez. Si un texte est vide, sa section n'apparaît pas sur le site. Le badge « À compléter » signale les textes provisoires.
+L'administration sert uniquement à gérer la **bibliothèque** (ressources, fiches PDF, catégories). Les éléments du site lui-même sont fixés dans la base, et se changent sur demande (ou dans Supabase → *Table Editor*) :
 
-### Informations
-
-Cette page regroupe :
-- le nom de l'église et le message d'accueil ;
-- les **4 points forts** de l'accueil ;
-- la rencontre : jour, heure, adresse et précision (le bouton « Itinéraire » ouvre l'application de cartes du téléphone) ;
-- les **personnes à contacter** (jusqu'à 4, prénom + numéro : Clotilde et Ephrem au départ), l'email et le lien WhatsApp (`https://wa.me/33…`) ;
-- les **photos du site** : l'accueil (une photo est fournie par défaut), le haut de la fenêtre « En savoir plus » et la page Nous rejoindre. Préférez des photos en format paysage, d'au moins 1600 px de large, pour qu'elles restent nettes.
+| Élément | Valeur actuelle | Table / colonne |
+|---|---|---|
+| Petit titre de l'accueil | « Église de maison République Villeurbanne » | `site_settings.hero_kicker` |
+| Message d'accueil | « Un espace de communion, d'étude et d'édification autour de la Parole de Dieu. » | `site_settings.hero_text` |
+| Vision | « Au sein de l'EDM République, notre vision est de diffuser l'amour. » | `site_pages` (ligne `vision`) |
+| Rencontre | Études bibliques, chaque jeudi à partir de 19h30 | `site_settings.meeting_*` |
+| Adresse | 61 rue Anatole France, 69100 Villeurbanne | `site_settings.address` |
+| Contacts | Clotilde · 06 51 99 94 22 ; Ephrem · 07 87 07 20 22 | `site_settings.contacts` |
+| Photo de l'accueil | `public/assets/accueil.jpg` | fichier du site |
 
 > En cas d'erreur dans un formulaire, ce que vous avez tapé est conservé : corrigez le champ signalé en rouge et enregistrez à nouveau.
 
@@ -243,7 +244,7 @@ SUPABASE_URL=… SUPABASE_ANON_KEY=… ADMIN_EMAIL=… ADMIN_PASSWORD=… USER_E
 app/
   (site)/                 pages publiques : accueil (avec la fenêtre « En savoir plus »), bibliotheque (+ [slug]), nous-rejoindre (rencontres + section contact)
   admin/connexion         connexion
-  admin/(espace)/         tableau de bord, ressources, catégories, pages, informations (protégé)
+  admin/(espace)/         tableau de bord, ressources, catégories (protégé)
   admin/actions.ts        actions serveur : contrôle admin + validation Zod + RLS
   api/keepalive           tâche quotidienne anti-pause
   manifest.ts, robots.ts, sitemap.ts  (page hors ligne : public/hors-ligne.html)
