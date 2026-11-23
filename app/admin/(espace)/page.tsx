@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { BookOpen, FileText, FolderOpen, PencilLine, Plus, Tags } from 'lucide-react';
+import { BookOpen, FileText, FolderOpen, PencilLine, Plus } from 'lucide-react';
 import { TitreAdmin } from '@/components/admin/Retour';
 import { exigerAdminPage } from '@/lib/auth';
 import { ilYa } from '@/lib/outils';
@@ -7,10 +7,9 @@ import { VignetteRessource } from '@/components/bibliotheque/CarteRessource';
 
 export default async function TableauDeBord() {
   const { supabase } = await exigerAdminPage();
-  const [ressources, fiches, categories, dernieres] = await Promise.all([
+  const [ressources, fiches, dernieres] = await Promise.all([
     supabase.from('resources').select('is_published'),
     supabase.from('resource_files').select('id', { count: 'exact', head: true }),
-    supabase.from('categories').select('id', { count: 'exact', head: true }),
     supabase
       .from('resources')
       .select('id, title, slug, description, youtube_url, cover_path, is_published, updated_at')
@@ -22,7 +21,6 @@ export default async function TableauDeBord() {
   const stats = [
     { libelle: 'Ressources publiées', valeur: publiees, detail: `${liste.length - publiees} non publiée${liste.length - publiees > 1 ? 's' : ''}`, icone: FolderOpen },
     { libelle: 'Fiches PDF', valeur: fiches.count ?? 0, icone: FileText },
-    { libelle: 'Catégories', valeur: categories.count ?? 0, icone: Tags },
   ];
 
   return (
@@ -35,7 +33,7 @@ export default async function TableauDeBord() {
           </Link>
         }
       />
-      <ul className="grid gap-4 sm:grid-cols-3">
+      <ul className="grid gap-4 sm:grid-cols-2">
         {stats.map(({ libelle, valeur, detail, icone: Icone }) => (
           <li key={libelle} className="carte flex items-center gap-4 p-5">
             <span className="flex size-12 items-center justify-center rounded-2xl bg-papier-2">
@@ -90,8 +88,8 @@ export default async function TableauDeBord() {
           <Link href="/admin/ressources/nouvelle" className="carte flex min-h-20 items-center gap-3 p-5 font-semibold hover:border-vert">
             <Plus aria-hidden size={20} /> Ajouter une ressource
           </Link>
-          <Link href="/admin/categories" className="carte flex min-h-20 items-center gap-3 p-5 font-semibold hover:border-vert">
-            <Tags aria-hidden size={20} /> Gérer les catégories
+          <Link href="/admin/ressources" className="carte flex min-h-20 items-center gap-3 p-5 font-semibold hover:border-vert">
+            <FolderOpen aria-hidden size={20} /> Toutes les ressources
           </Link>
           <Link href="/bibliotheque" target="_blank" className="carte flex min-h-20 items-center gap-3 p-5 font-semibold hover:border-vert">
             <BookOpen aria-hidden size={20} /> Voir la bibliothèque<span className="sr-only"> (nouvel onglet)</span>

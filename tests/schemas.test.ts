@@ -5,16 +5,13 @@ const ressourceValide = {
   title: 'La foi',
   description: '',
   youtube_url: '',
-  category_id: '',
-  biblical_references: '',
-  resource_date: '',
   is_published: false,
 };
 
 describe('schemaRessource', () => {
   it('accepte une ressource avec seulement un titre (vidéo et PDF facultatifs)', () => {
     const r = schemaRessource.parse(ressourceValide);
-    expect(r).toMatchObject({ title: 'La foi', youtube_url: null, description: null, category_id: null, resource_date: null });
+    expect(r).toMatchObject({ title: 'La foi', youtube_url: null, description: null, is_published: false });
   });
   it('exige un titre', () => {
     const r = schemaRessource.safeParse({ ...ressourceValide, title: '   ' });

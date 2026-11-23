@@ -8,7 +8,7 @@ import { FormulaireRessource } from '@/components/admin/FormulaireRessource';
 import { GestionFiches } from '@/components/admin/GestionFiches';
 import { Retour, TitreAdmin } from '@/components/admin/Retour';
 import { exigerAdminPage } from '@/lib/auth';
-import type { Categorie, FichePdf, Ressource } from '@/lib/types';
+import type { FichePdf, Ressource } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'Modifier une ressource' };
 
@@ -22,10 +22,9 @@ export default async function ModifierRessource({
   const [{ id }, { cree }] = await Promise.all([params, searchParams]);
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const { supabase } = await exigerAdminPage();
-  const [{ data: r }, { data: fiches }, { data: categories }] = await Promise.all([
+  const [{ data: r }, { data: fiches }] = await Promise.all([
     supabase.from('resources').select('*').eq('id', id).maybeSingle(),
     supabase.from('resource_files').select('*').eq('resource_id', id).order('display_order'),
-    supabase.from('categories').select('*').order('position').order('name'),
   ]);
   if (!r) notFound();
   const ressource = r as Ressource;
@@ -49,7 +48,7 @@ export default async function ModifierRessource({
       {cree && <Retour resultat={{ ok: true, message: 'Ressource créée. Ajoutez maintenant les fiches PDF et une image si besoin.' }} className="mb-6" />}
 
       <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr] xl:items-start">
-        <FormulaireRessource ressource={ressource} categories={(categories ?? []) as Categorie[]} />
+        <FormulaireRessource ressource={ressource} />
         <div className="space-y-6">
           <GestionFiches ressourceId={ressource.id} fiches={(fiches ?? []) as FichePdf[]} />
           <section className="carte p-5 sm:p-7">

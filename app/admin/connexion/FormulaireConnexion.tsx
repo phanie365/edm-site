@@ -14,11 +14,26 @@ export function FormulaireConnexion() {
         </p>
       )}
       <div className="space-y-2">
-        <label htmlFor="email" className="font-semibold">
-          Email
+        <label htmlFor="identifiant" className="font-semibold">
+          Identifiant
         </label>
-        <input id="email" name="email" type="email" autoComplete="username" inputMode="email" required className="champ" aria-invalid={e.email ? true : undefined} />
-        {e.email && <p className="text-sm text-erreur">{e.email}</p>}
+        <input
+          id="identifiant"
+          name="identifiant"
+          type="text"
+          autoComplete="username"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+          required
+          className="champ"
+          aria-describedby="identifiant-aide"
+          aria-invalid={e.identifiant ? true : undefined}
+        />
+        <p id="identifiant-aide" className="text-sm text-encre-2">
+          Votre nom d’utilisateur (ex. clotilde) ou votre email.
+        </p>
+        {e.identifiant && <p className="text-sm text-erreur">{e.identifiant}</p>}
       </div>
       <div className="space-y-2">
         <label htmlFor="motDePasse" className="font-semibold">

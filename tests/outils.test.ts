@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { blocsDeTexte, dateLongue, extrait, idYoutube, lienTelephone, slugifier, tailleLisible } from '../lib/outils';
+import { blocsDeTexte, dateLongue, emailDepuisIdentifiant, extrait, idYoutube, lienTelephone, slugifier, tailleLisible } from '../lib/outils';
 
 describe('idYoutube', () => {
   it.each([
@@ -60,4 +60,15 @@ describe('formats', () => {
     expect(e.length).toBeLessThanOrEqual(21);
   });
   it('lienTelephone', () => expect(lienTelephone('06 12 34 56 78')).toBe('tel:0612345678'));
+});
+
+describe('emailDepuisIdentifiant', () => {
+  it('transforme un nom d’utilisateur en email interne', () => {
+    expect(emailDepuisIdentifiant('Clotilde')).toBe('clotilde@edm-republique.local');
+    expect(emailDepuisIdentifiant('  ephrem.k ')).toBe('ephrem.k@edm-republique.local');
+  });
+  it('garde un email complet', () => expect(emailDepuisIdentifiant('Marie@Exemple.fr')).toBe('marie@exemple.fr'));
+  it('refuse les identifiants invalides', () => {
+    for (const v of ['', 'a', 'avec espace', 'x@', '../admin', 'é']) expect(emailDepuisIdentifiant(v)).toBeNull();
+  });
 });

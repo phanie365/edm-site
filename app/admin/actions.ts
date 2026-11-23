@@ -4,10 +4,9 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { AccesRefuse, exigerAdminAction } from '@/lib/auth';
 import { BUCKET_FICHES, BUCKET_IMAGES } from '@/lib/env';
-import { slugifier } from '@/lib/outils';
+import { emailDepuisIdentifiant, slugifier } from '@/lib/outils';
 import {
   erreursParChamp,
-  schemaCategorie,
   schemaFiche,
   schemaImage,
   schemaRessource,
@@ -43,15 +42,20 @@ function rafraichirSite() {
 
 export async function seConnecter(_avant: Resultat | null, formData: FormData): Promise<Resultat> {
   const donnees = z
-    .object({ email: z.string().trim().email('Email invalide.'), motDePasse: z.string().min(1, 'Mot de passe requis.') })
-    .safeParse({ email: formData.get('email'), motDePasse: formData.get('motDePasse') });
+    .object({
+      identifiant: z.string().trim().min(1, 'Indiquez votre identifiant.'),
+      motDePasse: z.string().min(1, 'Mot de passe requis.'),
+    })
+    .safeParse({ identifiant: formData.get('identifiant') ?? '', motDePasse: formData.get('motDePasse') ?? '' });
   if (!donnees.success) return KO('Vérifiez les champs.', erreursParChamp(donnees.error));
+  const email = emailDepuisIdentifiant(donnees.data.identifiant);
+  if (!email) return KO('Identifiant ou mot de passe incorrect.');
 
   const supabase = await clientSession();
-  const { data, error } = await supabase.auth.signInWithPassword({ email: donnees.data.email, password: donnees.data.motDePasse });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password: donnees.data.motDePasse });
   if (error || !data.user) {
     const m = error?.message.toLowerCase() ?? '';
-    if (m.includes('invalid login')) return KO('Email ou mot de passe incorrect.');
+    if (m.includes('invalid login')) return KO('Identifiant ou mot de passe incorrect.');
     if (m.includes('rate') || error?.status === 429) return KO('Trop de tentatives. Patientez quelques minutes.');
     return KO('Connexion impossible pour le moment.');
   }
@@ -89,9 +93,6 @@ export async function enregistrerRessource(_avant: Resultat | null, formData: Fo
     title: formData.get('title') ?? '',
     description: formData.get('description') ?? '',
     youtube_url: formData.get('youtube_url') ?? '',
-    category_id: formData.get('category_id') ?? '',
-    biblical_references: formData.get('biblical_references') ?? '',
-    resource_date: formData.get('resource_date') ?? '',
     is_published: formData.get('is_published') === 'on',
   });
   if (!verif.success) return KO('Merci de corriger les champs indiqués.', erreursParChamp(verif.error));
@@ -284,49 +285,4 @@ export async function definirCouverture(ressourceId: string, chemin: string | nu
   }
   rafraichirSite();
   return OK(chemin ? 'Image enregistrée.' : 'Image retirée.');
-}
-
-/* =========================== Catégories =========================== */
-
-export async function ajouterCategorie(_avant: Resultat | null, formData: FormData): Promise<Resultat> {
-  const verif = schemaCategorie.safeParse({ name: formData.get('name') ?? '' });
-  if (!verif.success) return KO('Nom invalide.', erreursParChamp(verif.error));
-  try {
-    const { supabase } = await exigerAdminAction();
-    const { count } = await supabase.from('categories').select('id', { count: 'exact', head: true });
-    const { error } = await supabase
-      .from('categories')
-      .insert({ name: verif.data.name, slug: slugifier(verif.data.name) || `categorie-${Date.now()}`, position: (count ?? 0) + 1 });
-    if (error) throw error;
-  } catch (e) {
-    return KO(traduire(e));
-  }
-  rafraichirSite();
-  return OK(`Catégorie « ${verif.data.name} » ajoutée.`);
-}
-
-export async function renommerCategorie(id: string, nom: string): Promise<Resultat> {
-  const verif = schemaCategorie.safeParse({ name: nom });
-  if (!verif.success) return KO(verif.error.issues[0]?.message ?? 'Nom invalide.');
-  try {
-    const { supabase } = await exigerAdminAction();
-    const { error } = await supabase.from('categories').update({ name: verif.data.name }).eq('id', z.string().uuid().parse(id));
-    if (error) throw error;
-  } catch (e) {
-    return KO(traduire(e));
-  }
-  rafraichirSite();
-  return OK('Catégorie renommée.');
-}
-
-export async function supprimerCategorie(id: string): Promise<Resultat> {
-  try {
-    const { supabase } = await exigerAdminAction();
-    const { error } = await supabase.from('categories').delete().eq('id', z.string().uuid().parse(id));
-    if (error) throw error;
-  } catch (e) {
-    return KO(traduire(e));
-  }
-  rafraichirSite();
-  return OK('Catégorie supprimée. Les ressources concernées n’ont plus de catégorie.');
 }

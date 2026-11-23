@@ -28,35 +28,22 @@ create table public.admins (
   created_at timestamptz not null default now()
 );
 
--- ---------- Catégories ----------
-create table public.categories (
-  id         uuid primary key default gen_random_uuid(),
-  name       text not null unique check (btrim(name) <> '' and length(name) <= 60),
-  slug       text not null unique check (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'),
-  position   int  not null default 0,
-  created_at timestamptz not null default now()
-);
-
--- ---------- Ressources (prédication, enseignement, fiche…) ----------
+-- ---------- Ressources (prédication, enseignement, fiches…) ----------
 create table public.resources (
   id                  uuid primary key default gen_random_uuid(),
   title               text not null check (btrim(title) <> '' and length(title) <= 160),
   slug                text not null unique check (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$' and length(slug) <= 120),
   description         text check (description is null or length(description) <= 10000),
   youtube_url         text check (youtube_url is null or youtube_url ~* '^https://(www\.|m\.)?(youtube\.com|youtu\.be)/'),
-  category_id         uuid references public.categories (id) on delete set null,
   cover_path          text,                        -- chemin dans le bucket « images »
-  biblical_references text check (biblical_references is null or length(biblical_references) <= 300),
-  resource_date       date,                        -- date de la prédication (facultative)
   is_published        boolean not null default false,
   search_text         text generated always as (
-                        public.sans_accents(title || ' ' || coalesce(description, '') || ' ' || coalesce(biblical_references, ''))
+                        public.sans_accents(title || ' ' || coalesce(description, ''))
                       ) stored,
   created_at          timestamptz not null default now(),
   updated_at          timestamptz not null default now()
 );
-create index resources_publiees_idx on public.resources (is_published, resource_date desc nulls last, created_at desc);
-create index resources_categorie_idx on public.resources (category_id);
+create index resources_publiees_idx on public.resources (is_published, created_at desc);
 
 -- ---------- Fiches PDF d'une ressource ----------
 create table public.resource_files (
@@ -151,7 +138,6 @@ revoke execute on function public.is_admin() from public;
 grant  execute on function public.is_admin() to anon, authenticated;
 
 alter table public.admins         enable row level security;
-alter table public.categories     enable row level security;
 alter table public.resources      enable row level security;
 alter table public.resource_files enable row level security;
 alter table public.site_settings  enable row level security;
@@ -162,7 +148,6 @@ revoke insert, update, delete, truncate on all tables in schema public from anon
 revoke truncate on all tables in schema public from authenticated;
 
 -- ---------- Lecture ----------
-create policy "lecture categories"  on public.categories    for select to anon, authenticated using (true);
 create policy "lecture reglages"    on public.site_settings for select to anon, authenticated using (true);
 create policy "lecture pages"       on public.site_pages    for select to anon, authenticated using (true);
 create policy "lecture ressources publiees" on public.resources for select to anon, authenticated
@@ -173,8 +158,6 @@ create policy "lecture fiches des ressources publiees" on public.resource_files 
 create policy "admin lit sa ligne" on public.admins for select to authenticated using (user_id = (select auth.uid()));
 
 -- ---------- Écriture : administrateurs ----------
-create policy "admin categories" on public.categories for all to authenticated
-  using ((select public.is_admin())) with check ((select public.is_admin()));
 create policy "admin ressources" on public.resources for all to authenticated
   using ((select public.is_admin())) with check ((select public.is_admin()));
 create policy "admin fiches" on public.resource_files for all to authenticated
@@ -186,42 +169,38 @@ create policy "admin pages" on public.site_pages for update to authenticated
 
 -- ---------- Recherche dans la bibliothèque ----------
 -- Retourne uniquement les ressources publiées. Chaque mot cherché doit apparaître
--- (sans tenir compte des accents) dans le titre, la description, les références
--- bibliques ou le nom de la catégorie.
+-- (sans tenir compte des accents) dans le titre ou la description.
 create function public.rechercher_ressources(
-  p_q text default null, p_categorie text default null, p_limite int default 12, p_decalage int default 0
+  p_q text default null, p_limite int default 12, p_decalage int default 0
 ) returns table (
   id uuid, title text, slug text, description text, youtube_url text, cover_path text,
-  biblical_references text, resource_date date, created_at timestamptz,
-  category_name text, category_slug text, nb_fiches int, total bigint
+  created_at timestamptz,
+  nb_fiches int, total bigint
 )
 language sql stable security invoker set search_path = '' as $$
   with base as (
-    select r.*, c.name as category_name, c.slug as category_slug
+    select r.*
     from public.resources r
-    left join public.categories c on c.id = r.category_id
     where r.is_published
-      and (p_categorie is null or p_categorie = '' or c.slug = p_categorie)
       and (
         p_q is null or btrim(p_q) = ''
         or not exists (
           select 1
           from regexp_split_to_table(public.sans_accents(btrim(left(p_q, 100))), '\s+') as mot
-          where mot <> '' and strpos(r.search_text || ' ' || public.sans_accents(c.name), mot) = 0
+          where mot <> '' and strpos(r.search_text, mot) = 0
         )
       )
   )
   select b.id, b.title, b.slug, b.description, b.youtube_url, b.cover_path,
-         b.biblical_references, b.resource_date, b.created_at,
-         b.category_name, b.category_slug,
+         b.created_at,
          (select count(*) from public.resource_files f where f.resource_id = b.id)::int,
          count(*) over ()
   from base b
-  order by coalesce(b.resource_date, b.created_at::date) desc, b.created_at desc
+  order by b.created_at desc
   limit least(greatest(coalesce(p_limite, 12), 1), 48)
   offset greatest(coalesce(p_decalage, 0), 0)
 $$;
-grant execute on function public.rechercher_ressources(text, text, int, int) to anon, authenticated;
+grant execute on function public.rechercher_ressources(text, int, int) to anon, authenticated;
 
 -- Réordonne les fiches d'une ressource en une seule opération.
 create function public.reordonner_fiches(p_ressource uuid, p_ids uuid[]) returns void

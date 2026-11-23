@@ -55,29 +55,31 @@ La mise en place prend environ 30 minutes, une seule fois. Ensuite, tout se fait
 
 ## 3. Créer la base de données
 
-Les scripts sont dans le dossier **`supabase/migrations/`**. Pour chacun, **dans l'ordre** :
-
 1. Dans Supabase, ouvrez **SQL Editor** puis **New query**.
-2. Ouvrez le fichier sur votre ordinateur (avec le Bloc-notes, par exemple), copiez **tout** son contenu et collez-le.
+2. Ouvrez `supabase/installation.sql` sur votre ordinateur (avec le Bloc-notes, par exemple), copiez **tout** son contenu et collez-le.
 3. Cliquez sur **Run**. Le message attendu est « Success ».
 
-| Ordre | Fichier | Ce qu'il fait |
-|---|---|---|
-| 1 | `20261120000100_schema.sql` | les tables : ressources, fiches, catégories, réglages, pages |
-| 2 | `20261120000200_securite.sql` | la sécurité : les visiteurs ne peuvent que lire le contenu publié |
-| 3 | `20261120000300_stockage.sql` | les espaces de stockage des PDF et des photos |
+Ce fichier crée tout d'un coup : les tables, la sécurité (les visiteurs ne peuvent que lire le contenu publié) et le stockage des PDF et des images. Il contient aussi les textes du site : petit titre, vision, adresse, contacts. Il regroupe les 3 fichiers du dossier `supabase/migrations/`.
 
-> La bibliothèque est vide au départ : ajoutez vos ressources depuis l'admin (section 7).
+> **Vous aviez déjà exécuté une ancienne version ?** Exécutez d'abord `supabase/reinstallation.sql`, puis `installation.sql`, puis refaites l'étape 4. Cela efface les ressources : à faire tant que la bibliothèque est vide.
+
+La bibliothèque est vide au départ : ajoutez vos ressources depuis l'admin (section 7).
 
 ---
 
 ## 4. Créer le premier administrateur
 
-1. Dans Supabase, allez dans **Authentication → Users**, puis **Add user** → **Create new user**.
-2. Saisissez votre email et un mot de passe solide (12 caractères ou plus), et cochez **Auto Confirm User**.
-3. Ouvrez `supabase/creer_admin.sql`, remplacez `VOTRE-EMAIL@exemple.fr` par votre email, puis exécutez-le dans le **SQL Editor**.
+La connexion à `/admin` se fait avec un **identifiant** (par exemple `clotilde`) et un **mot de passe** que vous choisissez.
 
-Le résultat doit afficher votre email. Pour ajouter un autre administrateur, refaites les étapes 1 à 3 avec son email.
+1. Dans Supabase, allez dans **Authentication → Users**, puis **Add user** → **Create new user**.
+2. Remplissez :
+   - **Email** : votre identifiant suivi de `@edm-republique.local`, par exemple `clotilde@edm-republique.local`. Ce n'est pas une vraie adresse, c'est juste la forme attendue par Supabase. Un vrai email fonctionne aussi ; vous vous connecterez alors avec cet email.
+   - **Password** : un mot de passe solide, de 12 caractères ou plus.
+   - Cochez **Auto Confirm User**.
+3. Ouvrez `supabase/creer_admin.sql`, remplacez `clotilde` par votre identifiant, puis exécutez-le dans le **SQL Editor**. Le résultat doit afficher l'identifiant.
+4. Sur `/admin`, connectez-vous avec l'**identifiant** (ex. `clotilde`) et le **mot de passe**.
+
+Pour ajouter un autre administrateur, refaites ces étapes avec son identifiant. Pour changer un mot de passe oublié avec un identifiant (sans vraie adresse email), supprimez l'utilisateur dans Supabase et recréez-le.
 
 ---
 
@@ -141,16 +143,15 @@ Le message « Votre message a bien été envoyé » ne s'affiche **que si Resend
 
 ## 7. Utiliser l'administration
 
-Rendez-vous sur `/admin` et connectez-vous avec votre email et votre mot de passe. Sur téléphone, le menu s'ouvre avec le bouton ☰.
+Rendez-vous sur `/admin` et connectez-vous avec votre identifiant et votre mot de passe. Sur téléphone, le menu s'ouvre avec le bouton ☰.
 
 ### Ressources (la bibliothèque)
 
 1. Cliquez sur **Ajouter une ressource**. Seul le **titre** est obligatoire. Vous pouvez ajouter :
    - une description (une ligne vide sépare deux paragraphes, une ligne commençant par « - » crée une liste) ;
-   - un lien YouTube (vérifié automatiquement) ;
-   - des références bibliques ;
-   - une catégorie ;
-   - une date.
+   - un lien YouTube (vérifié automatiquement).
+
+   La date affichée est celle de l'**ajout** de la ressource, enregistrée automatiquement. Les ressources les plus récentes apparaissent en premier.
 2. Cliquez sur **Créer la ressource**. Vous arrivez sur sa page, où vous pouvez :
    - **déposer des PDF** : glissez-les, ou cliquez sur *Choisir des PDF* (plusieurs à la fois, 25 Mo maximum chacun). Ils sont classés par nom de fichier : nommez-les `01-…`, `02-…` ;
    - **renommer** une fiche : modifiez le nom, puis cliquez ailleurs ;
@@ -162,16 +163,9 @@ Une ressource peut avoir une vidéo seule, des PDF seuls, ou les deux. Le site n
 
 Dans la liste des ressources, **Publier / Retirer** permet de masquer une ressource sans la supprimer. **Supprimer la ressource** efface aussi ses PDF et son image.
 
-### Catégories
-
-Elles servent de filtres dans la bibliothèque (par exemple : Prédications, Enseignements, Sujets).
-- **Ajouter :** saisissez le nom et validez.
-- **Renommer :** modifiez le nom, puis cliquez ailleurs.
-- **Supprimer :** les ressources concernées restent en ligne, simplement sans catégorie.
-
 ### Ce qui ne se modifie pas depuis l'admin
 
-L'administration sert uniquement à gérer la **bibliothèque** (ressources, fiches PDF, catégories). Les éléments du site lui-même sont fixés dans la base, et se changent sur demande (ou dans Supabase → *Table Editor*) :
+L'administration sert uniquement à gérer la **bibliothèque** (ressources et fiches PDF). Les éléments du site lui-même sont fixés dans la base, et se changent sur demande (ou dans Supabase → *Table Editor*) :
 
 | Élément | Valeur actuelle | Table / colonne |
 |---|---|---|
@@ -206,8 +200,8 @@ C'est **facultatif** : le site fonctionne normalement dans le navigateur.
 
 | Problème | Solution |
 |---|---|
-| « Email ou mot de passe incorrect » | Vérifiez l'email. Pour changer le mot de passe : Supabase → Authentication → Users → ⋯ → *Send password recovery*. |
-| « Ce compte n'a pas accès à l'administration » | Exécutez `creer_admin.sql` avec cet email (section 4). |
+| « Identifiant ou mot de passe incorrect » | Vérifiez l'identifiant (sans « @… ») et le mot de passe. En cas d'oubli : supprimez puis recréez l'utilisateur dans Supabase (section 4). |
+| « Ce compte n'a pas accès à l'administration » | Exécutez `creer_admin.sql` avec cet identifiant (section 4). |
 | Le site affiche « Le contenu n'a pas pu être chargé » | Supabase est peut-être en pause (voir ci-dessus), ou les variables Vercel sont incorrectes. |
 | Une ressource n'apparaît pas | Vérifiez qu'elle est **publiée**. |
 
@@ -244,7 +238,7 @@ SUPABASE_URL=… SUPABASE_ANON_KEY=… ADMIN_EMAIL=… ADMIN_PASSWORD=… USER_E
 app/
   (site)/                 pages publiques : accueil (avec la fenêtre « En savoir plus »), bibliotheque (+ [slug]), nous-rejoindre (rencontres + section contact)
   admin/connexion         connexion
-  admin/(espace)/         tableau de bord, ressources, catégories (protégé)
+  admin/(espace)/         tableau de bord, ressources (protégé)
   admin/actions.ts        actions serveur : contrôle admin + validation Zod + RLS
   api/keepalive           tâche quotidienne anti-pause
   manifest.ts, robots.ts, sitemap.ts  (page hors ligne : public/hors-ligne.html)
@@ -268,7 +262,7 @@ tests/                    tests unitaires
   - dans Storage : types autorisés et taille maximale ;
   - côté serveur : chemin et existence du fichier, avant tout enregistrement.
 - **Fraîcheur :** les pages publiques lisent Supabase à chaque visite. Une modification dans l'admin est donc visible immédiatement, sans délai de cache.
-- **Recherche :** une fonction SQL `rechercher_ressources` cherche dans le titre, la description, les références bibliques et la catégorie, sans tenir compte des accents (`unaccent`).
+- **Recherche :** une fonction SQL `rechercher_ressources` cherche dans le titre et la description, sans tenir compte des accents (`unaccent`).
 - **YouTube :** seule la miniature est chargée. Le lecteur `youtube-nocookie` ne se charge qu'au clic.
 - **PDF :** « Consulter » ouvre le PDF dans le lecteur du téléphone ou de l'ordinateur. « Télécharger » force l'enregistrement (`?download=` de Supabase). « Partager » utilise le partage natif du téléphone, ou copie le lien.
 
@@ -277,10 +271,9 @@ tests/                    tests unitaires
 - **Automatisés :** 39 tests unitaires et 39 tests de sécurité de la base. Dans Chrome (moteur Chromium), 57 tests de parcours :
   - mobile 375 px, tablette 820 px, ordinateur 1366 px, sans défilement horizontal ;
   - navigation, menu mobile et clavier ;
-  - recherche, filtres, YouTube à la demande, consultation et téléchargement des PDF ;
+  - recherche, YouTube à la demande, consultation et téléchargement des PDF ;
   - connexion admin (mauvais mot de passe, compte non admin) ;
   - création, modification et suppression d'une ressource, dépôt et suppression de fichiers ;
-  - catégories, textes, informations ;
   - PWA installable et mode hors ligne.
 - **Non testés sur de vrais appareils :** iPhone (Safari iOS), Android, iPad, ainsi que les navigateurs Firefox et Safari sur ordinateur. À vérifier à la main avant l'annonce :
   1. ouvrir un PDF puis le télécharger sur iPhone et sur Android ;

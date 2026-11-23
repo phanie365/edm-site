@@ -18,35 +18,22 @@ create table public.admins (
   created_at timestamptz not null default now()
 );
 
--- ---------- Catégories ----------
-create table public.categories (
-  id         uuid primary key default gen_random_uuid(),
-  name       text not null unique check (btrim(name) <> '' and length(name) <= 60),
-  slug       text not null unique check (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'),
-  position   int  not null default 0,
-  created_at timestamptz not null default now()
-);
-
--- ---------- Ressources (prédication, enseignement, fiche…) ----------
+-- ---------- Ressources (prédication, enseignement, fiches…) ----------
 create table public.resources (
   id                  uuid primary key default gen_random_uuid(),
   title               text not null check (btrim(title) <> '' and length(title) <= 160),
   slug                text not null unique check (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$' and length(slug) <= 120),
   description         text check (description is null or length(description) <= 10000),
   youtube_url         text check (youtube_url is null or youtube_url ~* '^https://(www\.|m\.)?(youtube\.com|youtu\.be)/'),
-  category_id         uuid references public.categories (id) on delete set null,
   cover_path          text,                        -- chemin dans le bucket « images »
-  biblical_references text check (biblical_references is null or length(biblical_references) <= 300),
-  resource_date       date,                        -- date de la prédication (facultative)
   is_published        boolean not null default false,
   search_text         text generated always as (
-                        public.sans_accents(title || ' ' || coalesce(description, '') || ' ' || coalesce(biblical_references, ''))
+                        public.sans_accents(title || ' ' || coalesce(description, ''))
                       ) stored,
   created_at          timestamptz not null default now(),
   updated_at          timestamptz not null default now()
 );
-create index resources_publiees_idx on public.resources (is_published, resource_date desc nulls last, created_at desc);
-create index resources_categorie_idx on public.resources (category_id);
+create index resources_publiees_idx on public.resources (is_published, created_at desc);
 
 -- ---------- Fiches PDF d'une ressource ----------
 create table public.resource_files (

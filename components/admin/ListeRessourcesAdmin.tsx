@@ -16,8 +16,7 @@ interface Ligne {
   youtube_url: string | null;
   cover_path: string | null;
   is_published: boolean;
-  resource_date: string | null;
-  categorie: string | null;
+  created_at: string;
   nbFiches: number;
 }
 
@@ -35,7 +34,7 @@ export function ListeRessourcesAdmin({ ressources }: { ressources: Ligne[] }) {
       ressources.filter(
         (r) =>
           (filtre === 'toutes' || (filtre === 'publiees') === r.is_published) &&
-          normaliser(`${r.title} ${r.categorie ?? ''}`).includes(normaliser(q.trim())),
+          normaliser(r.title).includes(normaliser(q.trim())),
       ),
     [ressources, q, filtre],
   );
@@ -79,8 +78,7 @@ export function ListeRessourcesAdmin({ ressources }: { ressources: Ligne[] }) {
               <div className="min-w-0 flex-1">
                 <p className="font-semibold break-words">{r.title}</p>
                 <p className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-encre-2">
-                  {r.categorie && <span>{r.categorie}</span>}
-                  {r.resource_date && <span>{dateLongue(r.resource_date)}</span>}
+                  <span>Ajoutée le {dateLongue(r.created_at)}</span>
                   {r.youtube_url && (
                     <span className="inline-flex items-center gap-1">
                       <SquarePlay aria-hidden size={15} className="text-youtube" /> Vidéo

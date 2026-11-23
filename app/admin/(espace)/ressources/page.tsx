@@ -12,8 +12,7 @@ export default async function Ressources({ searchParams }: { searchParams: Promi
   const { supprimee } = await searchParams;
   const { data, error } = await supabase
     .from('resources')
-    .select('id, title, slug, description, youtube_url, cover_path, is_published, resource_date, updated_at, category:categories(name), files:resource_files(count)')
-    .order('resource_date', { ascending: false, nullsFirst: false })
+    .select('id, title, slug, description, youtube_url, cover_path, is_published, created_at, updated_at, files:resource_files(count)')
     .order('created_at', { ascending: false });
 
   return (
@@ -40,8 +39,7 @@ export default async function Ressources({ searchParams }: { searchParams: Promi
             youtube_url: r.youtube_url,
             cover_path: r.cover_path,
             is_published: r.is_published,
-            resource_date: r.resource_date,
-            categorie: (r.category as unknown as { name: string } | null)?.name ?? null,
+            created_at: r.created_at,
             nbFiches: (r.files as unknown as { count: number }[])[0]?.count ?? 0,
           }))}
         />

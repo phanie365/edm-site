@@ -2,7 +2,7 @@ import 'server-only';
 import { cache } from 'react';
 import { clientPublic } from './supabase/serveur';
 import { RESSOURCES_PAR_PAGE } from './env';
-import type { Categorie, PageSite, Reglages, RessourceDetaillee, ResultatRecherche, SlugPage } from './types';
+import type { PageSite, Reglages, RessourceDetaillee, ResultatRecherche, SlugPage } from './types';
 
 /** Lectures publiques (contenu publié uniquement). Une erreur remonte vers error.tsx. */
 
@@ -18,15 +18,8 @@ export const lirePages = cache(async (): Promise<Record<SlugPage, PageSite>> => 
   return Object.fromEntries((data as PageSite[]).map((p) => [p.slug, p])) as Record<SlugPage, PageSite>;
 });
 
-export const lireCategories = cache(async (): Promise<Categorie[]> => {
-  const { data, error } = await clientPublic().from('categories').select('*').order('position').order('name');
-  if (error) throw new Error(`Catégories indisponibles : ${error.message}`);
-  return data as Categorie[];
-});
-
 export async function rechercherRessources(options: {
   q?: string;
-  categorie?: string;
   page?: number;
   parPage?: number;
 }): Promise<{ resultats: ResultatRecherche[]; total: number }> {
@@ -34,7 +27,6 @@ export async function rechercherRessources(options: {
   const page = Math.max(1, options.page ?? 1);
   const { data, error } = await clientPublic().rpc('rechercher_ressources', {
     p_q: options.q?.slice(0, 100) || null,
-    p_categorie: options.categorie || null,
     p_limite: parPage,
     p_decalage: (page - 1) * parPage,
   });
@@ -46,7 +38,7 @@ export async function rechercherRessources(options: {
 export const lireRessource = cache(async (slug: string): Promise<RessourceDetaillee | null> => {
   const { data, error } = await clientPublic()
     .from('resources')
-    .select('*, category:categories(name, slug), files:resource_files(*)')
+    .select('*, files:resource_files(*)')
     .eq('slug', slug)
     .eq('is_published', true)
     .order('display_order', { referencedTable: 'resource_files' })

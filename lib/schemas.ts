@@ -17,24 +17,9 @@ export const schemaRessource = z.object({
   youtube_url: facultatif(300).refine((v) => v === null || estUrlYoutube(v), {
     message: 'Ce lien n’est pas une vidéo YouTube (youtube.com/watch?v=… ou youtu.be/…).',
   }),
-  category_id: z
-    .string()
-    .trim()
-    .transform((v) => (v === '' ? null : v))
-    .refine((v) => v === null || z.string().uuid().safeParse(v).success, { message: 'Catégorie invalide.' }),
-  biblical_references: facultatif(300),
-  resource_date: z
-    .string()
-    .trim()
-    .transform((v) => (v === '' ? null : v))
-    .refine((v) => v === null || /^\d{4}-\d{2}-\d{2}$/.test(v), { message: 'Date invalide.' }),
   is_published: z.boolean(),
 });
 export type DonneesRessource = z.output<typeof schemaRessource>;
-
-export const schemaCategorie = z.object({
-  name: z.string().trim().min(1, 'Le nom est obligatoire.').max(60, '60 caractères maximum.'),
-});
 
 /** Fiche PDF déjà déposée dans Storage par le navigateur : on vérifie le chemin. */
 export const schemaFiche = z

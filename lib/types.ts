@@ -1,10 +1,3 @@
-export interface Categorie {
-  id: string;
-  name: string;
-  slug: string;
-  position: number;
-}
-
 export interface FichePdf {
   id: string;
   resource_id: string;
@@ -20,17 +13,13 @@ export interface Ressource {
   slug: string;
   description: string | null;
   youtube_url: string | null;
-  category_id: string | null;
   cover_path: string | null;
-  biblical_references: string | null;
-  resource_date: string | null;
   is_published: boolean;
   created_at: string;
   updated_at: string;
 }
 
 export interface RessourceDetaillee extends Ressource {
-  category: Pick<Categorie, 'name' | 'slug'> | null;
   files: FichePdf[];
 }
 
@@ -42,11 +31,7 @@ export interface ResultatRecherche {
   description: string | null;
   youtube_url: string | null;
   cover_path: string | null;
-  biblical_references: string | null;
-  resource_date: string | null;
   created_at: string;
-  category_name: string | null;
-  category_slug: string | null;
   nb_fiches: number;
   total: number;
 }

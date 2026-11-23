@@ -3,13 +3,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { ExternalLink, FolderOpen, LayoutDashboard, LogOut, Menu, Tags, X } from 'lucide-react';
+import { ExternalLink, FolderOpen, LayoutDashboard, LogOut, Menu, X } from 'lucide-react';
 import { seDeconnecter } from '@/app/admin/actions';
 
 const LIENS = [
   { href: '/admin', libelle: 'Tableau de bord', icone: LayoutDashboard },
   { href: '/admin/ressources', libelle: 'Ressources', icone: FolderOpen },
-  { href: '/admin/categories', libelle: 'Catégories', icone: Tags },
 ];
 
 const actif = (href: string, chemin: string) => (href === '/admin' ? chemin === '/admin' : chemin.startsWith(href));

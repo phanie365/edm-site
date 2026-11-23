@@ -11,12 +11,11 @@ export interface ApercuRessource {
   description: string | null;
   youtube_url: string | null;
   cover_path: string | null;
-  category_name: string | null;
   nb_fiches: number;
 }
 
 function Meta({ r }: { r: ApercuRessource }) {
-  const morceaux = [r.category_name, r.nb_fiches > 0 ? `${r.nb_fiches} fiche${r.nb_fiches > 1 ? 's' : ''}` : null].filter(Boolean);
+  const morceaux = [r.youtube_url ? 'Vidéo' : null, r.nb_fiches > 0 ? `${r.nb_fiches} fiche${r.nb_fiches > 1 ? 's' : ''}` : null].filter(Boolean);
   return (
     <p className="flex items-center gap-2 text-sm text-encre-2">
       <span>{morceaux.join(' · ') || 'Ressource'}</span>

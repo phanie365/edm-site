@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, BookMarked, CalendarDays } from 'lucide-react';
+import { ArrowLeft, CalendarDays } from 'lucide-react';
 import { LecteurYoutube } from '@/components/bibliotheque/LecteurYoutube';
 import { ListeFiches } from '@/components/bibliotheque/ListeFiches';
 import { VignetteRessource } from '@/components/bibliotheque/CarteRessource';
@@ -57,31 +57,16 @@ export default async function DetailRessource({ params }: { params: Params }) {
 
         <header className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
-            {r.category && (
-              <Link href={`/bibliotheque?categorie=${r.category.slug}`} className="rounded-full">
-                <Etiquette sombre>{r.category.name}</Etiquette>
-              </Link>
-            )}
             {fiches.length > 0 && <Etiquette>{`${fiches.length} fiche${fiches.length > 1 ? 's' : ''}`}</Etiquette>}
           </div>
           <h1 className="text-4xl leading-[1.08] font-bold sm:text-5xl">{r.title}</h1>
           <dl className="flex flex-wrap gap-x-6 gap-y-2 text-encre-2">
-            {r.resource_date && (
-              <div className="flex items-center gap-2">
-                <dt>
-                  <CalendarDays aria-label="Date" role="img" size={17} />
-                </dt>
-                <dd>{dateLongue(r.resource_date)}</dd>
-              </div>
-            )}
-            {r.biblical_references && (
-              <div className="flex items-center gap-2">
-                <dt>
-                  <BookMarked aria-label="Références bibliques" role="img" size={17} />
-                </dt>
-                <dd className="font-medium text-encre-3">{r.biblical_references}</dd>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <dt>
+                <CalendarDays aria-label="Date d’ajout" role="img" size={17} />
+              </dt>
+              <dd>Ajoutée le {dateLongue(r.created_at)}</dd>
+            </div>
           </dl>
         </header>
 

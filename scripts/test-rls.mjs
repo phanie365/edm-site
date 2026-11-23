@@ -30,7 +30,6 @@ async function ecrituresInterdites(sb, qui) {
   ok(`${qui} : créer une ressource est refusé`, refuse(await sb.from('resources').insert({ title: 'x', slug: `pirate-${Date.now()}` }).select()));
   ok(`${qui} : modifier les réglages est refusé`, refuse(await sb.from('site_settings').update({ address: 'PIRATÉ' }).eq('id', true).select()));
   ok(`${qui} : modifier une page est refusé`, refuse(await sb.from('site_pages').update({ content: 'PIRATÉ' }).eq('slug', 'vision').select()));
-  ok(`${qui} : créer une catégorie est refusé`, refuse(await sb.from('categories').insert({ name: 'Pirate', slug: 'pirate' }).select()));
   if (r) {
     ok(`${qui} : modifier une ressource est refusé`, refuse(await sb.from('resources').update({ title: 'PIRATÉ' }).eq('id', r.id).select()));
     ok(`${qui} : supprimer une ressource est refusé`, refuse(await sb.from('resources').delete().eq('id', r.id).select()));
@@ -49,7 +48,7 @@ console.log('\n— Visiteur sans compte —');
   const sb = client();
   const res = await sb.from('resources').select('is_published');
   ok('visiteur : ne voit que les ressources publiées', !res.error && res.data.every((x) => x.is_published), `${res.data?.length ?? 0} visibles`);
-  const rech = await sb.rpc('rechercher_ressources', { p_q: null, p_categorie: null, p_limite: 48, p_decalage: 0 });
+  const rech = await sb.rpc('rechercher_ressources', { p_q: null, p_limite: 48, p_decalage: 0 });
   ok('visiteur : la recherche fonctionne', !rech.error, rech.error?.message);
   ok('visiteur : lit les réglages et les pages', !(await sb.from('site_settings').select('*').single()).error && !(await sb.from('site_pages').select('*')).error);
   ok('visiteur : la table admins est invisible', ((await sb.from('admins').select('*')).data ?? []).length === 0);

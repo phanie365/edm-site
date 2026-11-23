@@ -101,3 +101,17 @@ export const lienItineraire = (adresse: string) =>
 
 /** Lien « tel: » à partir d'un numéro saisi librement. */
 export const lienTelephone = (tel: string) => `tel:${tel.replace(/[^\d+]/g, '')}`;
+
+/** Domaine interne des identifiants : « clotilde » devient « clotilde@edm-republique.local ». */
+export const DOMAINE_IDENTIFIANTS = 'edm-republique.local';
+
+/**
+ * Transforme ce qui est tapé dans « Identifiant » en email Supabase.
+ * Un email complet est gardé tel quel ; un nom d'utilisateur reçoit le domaine interne.
+ * Renvoie null si l'identifiant n'est pas valide.
+ */
+export function emailDepuisIdentifiant(saisie: string): string | null {
+  const v = saisie.trim().toLowerCase();
+  if (v.includes('@')) return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) ? v : null;
+  return /^[a-z0-9][a-z0-9._-]{1,39}$/.test(v) ? `${v}@${DOMAINE_IDENTIFIANTS}` : null;
+}

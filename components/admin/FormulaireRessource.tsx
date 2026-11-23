@@ -2,10 +2,10 @@
 import { useSoumission } from '@/lib/useSoumission';
 import { Save } from 'lucide-react';
 import { enregistrerRessource } from '@/app/admin/actions';
-import type { Categorie, Ressource } from '@/lib/types';
+import type { Ressource } from '@/lib/types';
 import { ErreurChamp, Retour } from './Retour';
 
-export function FormulaireRessource({ ressource, categories }: { ressource?: Ressource; categories: Categorie[] }) {
+export function FormulaireRessource({ ressource }: { ressource?: Ressource }) {
   const [etat, surSoumission, enCours] = useSoumission(enregistrerRessource);
   const e = etat?.erreurs ?? {};
   const aide = (id: string, erreur?: string) => ({ 'aria-invalid': erreur ? true : undefined, 'aria-describedby': erreur ? `${id}-erreur` : `${id}-aide` });
@@ -39,7 +39,7 @@ export function FormulaireRessource({ ressource, categories }: { ressource?: Res
           </p>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid gap-5">
           <div className="space-y-2">
             <label htmlFor="youtube_url" className="font-semibold">
               Lien YouTube
@@ -48,43 +48,6 @@ export function FormulaireRessource({ ressource, categories }: { ressource?: Res
             <ErreurChamp id="youtube_url-erreur" message={e.youtube_url} />
             <p id="youtube_url-aide" className="text-sm text-encre-2">
               Facultatif. Copiez le lien depuis le bouton « Partager » de YouTube.
-            </p>
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="biblical_references" className="font-semibold">
-              Références bibliques
-            </label>
-            <input id="biblical_references" name="biblical_references" type="text" maxLength={300} placeholder="Ex. Luc 15.11-32 ; Actes 3.19" defaultValue={ressource?.biblical_references ?? ''} className="champ" {...aide('biblical_references', e.biblical_references)} />
-            <ErreurChamp id="biblical_references-erreur" message={e.biblical_references} />
-            <p id="biblical_references-aide" className="text-sm text-encre-2">
-              Facultatif. Aide à retrouver la ressource dans la recherche.
-            </p>
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="category_id" className="font-semibold">
-              Catégorie
-            </label>
-            <select id="category_id" name="category_id" defaultValue={ressource?.category_id ?? ''} className="champ" {...aide('category_id', e.category_id)}>
-              <option value="">Aucune</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-            <ErreurChamp id="category_id-erreur" message={e.category_id} />
-            <p id="category_id-aide" className="text-sm text-encre-2">
-              Facultatif. Les catégories se gèrent dans le menu « Catégories ».
-            </p>
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="resource_date" className="font-semibold">
-              Date
-            </label>
-            <input id="resource_date" name="resource_date" type="date" defaultValue={ressource?.resource_date ?? ''} className="champ" {...aide('resource_date', e.resource_date)} />
-            <ErreurChamp id="resource_date-erreur" message={e.resource_date} />
-            <p id="resource_date-aide" className="text-sm text-encre-2">
-              Facultatif. Date de la prédication ; sert à l’ordre d’affichage.
             </p>
           </div>
         </div>
