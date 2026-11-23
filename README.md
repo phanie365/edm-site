@@ -110,7 +110,7 @@ Dans Supabase, cliquez sur le bouton **Connect** (ou allez dans **Project Settin
 | Nom | Valeur |
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | votre Project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | votre clé anon / publishable |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` (ou `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`) | votre clé anon / publishable |
 | `NEXT_PUBLIC_SITE_URL` | l'adresse du site, par exemple `https://edm-site.vercel.app` (sans `/` à la fin) |
 | `CRON_SECRET` | une longue phrase inventée, sans espaces |
 

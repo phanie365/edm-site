@@ -11,7 +11,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 const URL_ = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-const CLE = process.env.SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const CLE = process.env.SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 if (!URL_ || !CLE) {
   console.error('Renseignez SUPABASE_URL et SUPABASE_ANON_KEY.');
   process.exit(1);

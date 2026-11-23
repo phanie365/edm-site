@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     return Response.json({ ok: false, erreur: 'Non autorisé' }, { status: 401 });
   }
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const cle = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const cle = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !cle) return Response.json({ ok: false, erreur: 'Variables Supabase manquantes' }, { status: 500 });
   try {
     const res = await fetch(`${url.replace(/\/$/, '')}/rest/v1/site_settings?select=church_name&limit=1`, {
