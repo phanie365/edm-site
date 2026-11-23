@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { urlImage } from '@/lib/stockage';
 
 /**
- * Photo téléversée dans l'admin, ou à défaut un fond sobre aux couleurs du logo
+ * Photo téléversée dans l'admin, ou à défaut le logo complet sur un fond sobre
  * (aucune image de banque d'images n'est utilisée).
  */
 export function Visuel({
@@ -36,14 +36,14 @@ export function Visuel({
   }
   return (
     <div aria-hidden className={`relative overflow-hidden bg-papier-2 ${className} ${repliClassName}`}>
-      <div className="absolute -right-[12%] -bottom-[30%] aspect-square w-[70%] rounded-full border-[1.5px] border-vert/15" />
-      <div className="absolute -right-[2%] -bottom-[18%] aspect-square w-[46%] rounded-full bg-vert/[.06]" />
+      {/* Logo complet (EDM République Villeurbanne), centré */}
       <Image
-        src="/assets/logo-mark.png"
+        src="/assets/logo-lockup.png"
         alt=""
-        width={160}
-        height={160}
-        className="absolute top-1/2 left-1/2 w-[18%] max-w-28 min-w-12 -translate-x-1/2 -translate-y-1/2 opacity-90"
+        width={1085}
+        height={400}
+        sizes="(min-width: 1024px) 380px, 70vw"
+        className="absolute top-1/2 left-1/2 w-[68%] max-w-[380px] -translate-x-1/2 -translate-y-1/2"
       />
     </div>
   );
