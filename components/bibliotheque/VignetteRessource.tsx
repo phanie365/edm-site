@@ -27,7 +27,8 @@ export function VignetteRessource({ r, sizes, className = '' }: { r: Source; siz
           fill
           sizes={sizes}
           onError={() => setEnErreur(true)}
-          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          // La couverture est toujours affichée en entier ; la miniature YouTube remplit le cadre
+          className={`${couverture ? 'object-contain' : 'object-cover'} transition-transform duration-500 group-hover:scale-[1.03]`}
         />
       ) : (
         <div aria-hidden className="absolute inset-0 flex items-center justify-center">

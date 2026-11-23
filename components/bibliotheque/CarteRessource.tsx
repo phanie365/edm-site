@@ -34,7 +34,12 @@ export function CarteRessource({ r, priorite = false }: { r: ApercuRessource; pr
       <VignetteRessource
         r={r}
         sizes="(min-width: 1024px) 360px, (min-width: 640px) 45vw, 96px"
-        className="aspect-square w-24 flex-none rounded-xl sm:aspect-[16/10] sm:w-full sm:rounded-none"
+        className={
+          r.cover_path
+            ? // couverture au format portrait (1024 × 1536) : affichée en entier
+              'aspect-[2/3] w-20 flex-none rounded-xl sm:w-full sm:rounded-none'
+            : 'aspect-square w-24 flex-none rounded-xl sm:aspect-[16/10] sm:w-full sm:rounded-none'
+        }
       />
       <div className="flex min-w-0 flex-1 flex-col gap-1.5 py-1 sm:gap-2 sm:p-5">
         <h3 className="text-lg leading-snug font-bold">

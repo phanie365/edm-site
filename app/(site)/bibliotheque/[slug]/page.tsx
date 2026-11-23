@@ -50,8 +50,8 @@ export default async function DetailRessource({ params }: { params: Params }) {
         {avecImage && (
           <VignetteRessource
             r={r}
-            sizes="(min-width: 768px) 720px, 100vw"
-            className="mb-7 aspect-[16/9] rounded-[24px]"
+            sizes="(min-width: 416px) 384px, 100vw"
+            className="mx-auto mb-7 aspect-[2/3] w-full max-w-[260px] sm:max-w-sm rounded-[24px] shadow-[0_10px_30px_-12px_rgba(17,17,17,.25)]"
           />
         )}
 
